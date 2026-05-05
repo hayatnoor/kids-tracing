@@ -337,6 +337,7 @@ let idx     = 0;
 let drawing = false;
 let strokeN = 0;
 let done    = new Set();
+let canvasW = 0, canvasH = 0; // CSS-pixel dimensions of the canvas
 
 // ── CANVAS REFS ────────────────────────────────────────────────
 const wrap     = document.getElementById('canvas-wrap');
@@ -355,14 +356,18 @@ document.body.appendChild(tmplC);
 // ── RESIZE ────────────────────────────────────────────────────
 function resize() {
   const { width: W, height: H } = wrap.getBoundingClientRect();
-  [guideC, drawC, tmplC].forEach(c => { c.width = W; c.height = H; });
+  const dpr = window.devicePixelRatio || 1;
+  canvasW = W;
+  canvasH = H;
+  [guideC, drawC, tmplC].forEach(c => { c.width = W * dpr; c.height = H * dpr; });
+  [guideCtx, drawCtx, tmplCtx].forEach(ctx => ctx.setTransform(dpr, 0, 0, dpr, 0, 0));
   renderGuide();
 }
 window.addEventListener('resize', () => { resize(); clearDrawing(); });
 
 // ── GUIDE RENDERING ───────────────────────────────────────────
 function renderGuide() {
-  const W = guideC.width, H = guideC.height;
+  const W = canvasW, H = canvasH;
   if (!W || !H) return;
 
   const char = items[idx];
@@ -426,12 +431,10 @@ function clamp(min, val, max) { return Math.max(min, Math.min(max, val)); }
 // ── DRAWING ───────────────────────────────────────────────────
 function eventPos(e) {
   const rect = drawC.getBoundingClientRect();
-  const scX  = drawC.width  / rect.width;
-  const scY  = drawC.height / rect.height;
   const src  = e.touches ? (e.touches[0] || e.changedTouches[0]) : e;
   return {
-    x: (src.clientX - rect.left) * scX,
-    y: (src.clientY - rect.top)  * scY
+    x: src.clientX - rect.left,
+    y: src.clientY - rect.top
   };
 }
 
@@ -486,7 +489,7 @@ drawC.addEventListener('mouseleave', onUp);
 
 // ── CLEAR ─────────────────────────────────────────────────────
 function clearDrawing() {
-  drawCtx.clearRect(0, 0, drawC.width, drawC.height);
+  drawCtx.clearRect(0, 0, canvasW, canvasH);
   strokeN = 0;
 }
 
@@ -529,7 +532,7 @@ function checkTrace() {
     }
   }
 
-  const DR = Math.ceil(BRUSH / STEP); // dilation radius in grid units (strict: exactly brush-width tolerance)
+  const DR = Math.ceil(BRUSH * (window.devicePixelRatio || 1) / STEP); // dilation radius in grid units
 
   function dilate(grid) {
     const out = new Uint8Array(N);
