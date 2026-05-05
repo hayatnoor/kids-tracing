@@ -382,20 +382,14 @@ function renderGuide() {
   tmplCtx.fillStyle       = '#000';
   tmplCtx.fillText(char, W / 2, H / 2);
 
-  // Visual guide: faint fill + dashed stroke
+  // Visual guide: single faint fill
   guideCtx.clearRect(0, 0, W, H);
   guideCtx.font         = font;
   guideCtx.textAlign    = 'center';
   guideCtx.textBaseline = 'middle';
 
-  guideCtx.fillStyle = 'rgba(167,139,250,0.17)';
+  guideCtx.fillStyle = 'rgba(109,40,217,0.18)';
   guideCtx.fillText(char, W / 2, H / 2);
-
-  guideCtx.strokeStyle = 'rgba(109,40,217,0.5)';
-  guideCtx.lineWidth   = 7;
-  guideCtx.setLineDash([20, 14]);
-  guideCtx.strokeText(char, W / 2, H / 2);
-  guideCtx.setLineDash([]);
 
   // Instruction badge
   drawHint(guideCtx, W, H);
