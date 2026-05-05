@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Let's Trace!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Fredoka One', cursive;
+      height: 100vh;
+      overflow: hidden;
+      background: #f0f4ff;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* ── SCREENS ── */
+    .screen { display: none; }
+    .screen.active { display: flex; }
+
+    /* ── WELCOME ── */
+    #welcome {
+      height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 36px;
+      background: linear-gradient(160deg, #f9a8d4 0%, #818cf8 100%);
+    }
+
+    .welcome-title {
+      font-size: clamp(3.5rem, 13vw, 7rem);
+      color: white;
+      text-shadow: 0 7px 0 rgba(0,0,0,0.15);
+      animation: float 2.2s ease-in-out infinite alternate;
+      text-align: center;
+      line-height: 1.15;
+    }
+
+    .welcome-sub {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      color: rgba(255,255,255,0.88);
+      text-align: center;
+    }
+
+    .choice-row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    @keyframes float {
+      from { transform: translateY(0) rotate(-2deg); }
+      to   { transform: translateY(-18px) rotate(2deg); }
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      font-family: 'Fredoka One', cursive;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 80ms, box-shadow 80ms;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+    .btn:active {
+      transform: translateY(4px) !important;
+      box-shadow: none !important;
+    }
+    .btn-xl {
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      padding: 18px 46px;
+      box-shadow: 0 9px 0 rgba(0,0,0,0.22);
+    }
+    .btn-lg {
+      font-size: clamp(1.1rem, 3.5vw, 1.7rem);
+      padding: 13px 30px;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.18);
+    }
+    .btn-icon {
+      font-size: 1.6rem;
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 5px 0 rgba(0,0,0,0.14);
+      flex-shrink: 0;
+    }
+
+    .yellow  { background: #fde047; color: #44330a; }
+    .green   { background: #4ade80; color: #14532d; }
+    .red     { background: #f87171; color: white;   }
+    .blue    { background: #60a5fa; color: white;   }
+    .white   { background: white;   color: #555;    }
+
+    /* ── TRACING SCREEN ── */
+    #tracing {
+      height: 100vh;
+      flex-direction: column;
+      background: linear-gradient(160deg, #e0f2fe 0%, #ede9fe 100%);
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      flex-shrink: 0;
+      gap: 10px;
+    }
+
+    .char-label {
+      font-size: clamp(1.1rem, 4vw, 1.9rem);
+      color: #5b21b6;
+      flex: 1;
+      text-align: center;
+    }
+
+    /* Canvas area */
+    .canvas-wrap {
+      flex: 1;
+      position: relative;
+      margin: 0 12px;
+      border-radius: 28px;
+      overflow: hidden;
+      background: white;
+      box-shadow: 0 8px 32px rgba(100, 80, 200, 0.2);
+      min-height: 0;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      touch-action: none;
+      display: block;
+    }
+
+    #guide-canvas { z-index: 1; }
+    #draw-canvas  { z-index: 2; }
+
+    /* Progress */
+    .progress-row {
+      display: flex;
+      gap: 7px;
+      justify-content: center;
+      padding: 8px 12px 4px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+    .dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: rgba(130,100,200,0.22);
+      transition: background 0.3s;
+      flex-shrink: 0;
+    }
+    .dot.done    { background: #4ade80; }
+    .dot.current { background: #818cf8; }
+
+    /* Bottom bar */
+    .bottom-bar {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px 18px;
+      flex-shrink: 0;
+    }
+
+    /* ── RESULT OVERLAY ── */
+    #result-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(25,15,55,0.74);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+    }
+    #result-overlay.active { display: flex; }
+
+    .result-card {
+      background: white;
+      border-radius: 36px;
+      padding: clamp(24px, 6vw, 52px);
+      text-align: center;
+      width: min(92vw, 460px);
+      animation: popIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.4) translateY(40px); opacity: 0; }
+      to   { transform: scale(1)   translateY(0);    opacity: 1; }
+    }
+
+    .result-big-emoji {
+      font-size: clamp(3.5rem, 13vw, 6rem);
+      display: block;
+      margin-bottom: 6px;
+      animation: wobble 0.55s ease-in-out;
+    }
+    @keyframes wobble {
+      0%,100% { transform: rotate(0)    scale(1);   }
+      25%      { transform: rotate(-14deg) scale(1.25); }
+      75%      { transform: rotate(14deg)  scale(1.25); }
+    }
+
+    .result-msg {
+      font-size: clamp(2.2rem, 8vw, 3.8rem);
+      margin-bottom: 4px;
+    }
+    .result-sub {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: clamp(0.95rem, 3vw, 1.3rem);
+      color: #888;
+      margin-bottom: 14px;
+    }
+
+    .stars-row {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      margin: 10px 0 22px;
+    }
+    .star-item {
+      font-size: clamp(2rem, 7vw, 3rem);
+      opacity: 0;
+      animation: starBurst 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    @keyframes starBurst {
+      from { transform: scale(0) rotate(-45deg); opacity: 0; }
+      to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+    }
+
+    .result-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── SHAKE ── */
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      15%     { transform: translateX(-12px); }
+      30%     { transform: translateX(12px); }
+      45%     { transform: translateX(-8px); }
+      60%     { transform: translateX(8px); }
+      75%     { transform: translateX(-4px); }
+      90%     { transform: translateX(4px); }
+    }
+    .shake { animation: shake 0.45s ease-in-out; }
+
+    /* ── CONFETTI ── */
+    .confetto {
+      position: fixed;
+      pointer-events: none;
+      z-index: 600;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(-80px) rotate(0deg);   opacity: 1; }
+      100% { transform: translateY(110vh)  rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ WELCOME ═══════════════ -->
+<div id="welcome" class="screen active">
+  <div class="welcome-title">✏️<br>Let's Trace!</div>
+  <div class="welcome-sub">Choose what to practice 👇</div>
+  <div class="choice-row">
+    <button class="btn btn-xl yellow" onclick="startMode('letters')">🔤 Letters</button>
+    <button class="btn btn-xl green"  onclick="startMode('numbers')">🔢 Numbers</button>
+  </div>
+</div>
+
+<!-- ═══════════════ TRACING ═══════════════ -->
+<div id="tracing" class="screen">
+  <div class="top-bar">
+    <button class="btn btn-icon white" onclick="goHome()" title="Home">🏠</button>
+    <div class="char-label" id="char-label">Trace the letter A</div>
+    <button class="btn btn-icon white" onclick="skipCurrent()" title="Skip">⏭</button>
+  </div>
+
+  <div class="canvas-wrap" id="canvas-wrap">
+    <canvas id="guide-canvas"></canvas>
+    <canvas id="draw-canvas"></canvas>
+  </div>
+
+  <div class="progress-row" id="progress-row"></div>
+
+  <div class="bottom-bar">
+    <button class="btn btn-lg red"   onclick="clearDrawing()">🗑 Clear</button>
+    <button class="btn btn-lg green" onclick="checkTrace()">⭐ Check!</button>
+  </div>
+</div>
+
+<!-- ═══════════════ RESULT OVERLAY ═══════════════ -->
+<div id="result-overlay">
+  <div class="result-card">
+    <span class="result-big-emoji" id="r-emoji">🎉</span>
+    <div class="result-msg" id="r-msg">Amazing!</div>
+    <div class="result-sub" id="r-sub">You traced it perfectly!</div>
+    <div class="stars-row"  id="r-stars"></div>
+    <div class="result-btns">
+      <button class="btn btn-lg red"  onclick="tryAgain()">🔄 Try Again</button>
+      <button id="btn-next" class="btn btn-lg blue" onclick="nextChar()">Next ▶</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── CONSTANTS ──────────────────────────────────────────────────
+const LETTERS = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
+const NUMBERS = [...'0123456789'];
+const BRUSH   = 26;  // finger brush radius (px)
+const COLORS  = ['#f87171','#fb923c','#facc15','#4ade80','#38bdf8','#a78bfa','#f472b6'];
+
+// ── STATE ──────────────────────────────────────────────────────
+let mode    = 'letters';
+let items   = LETTERS;
+let idx     = 0;
+let drawing = false;
+let strokeN = 0;
+let done    = new Set();
+
+// ── CANVAS REFS ────────────────────────────────────────────────
+const wrap     = document.getElementById('canvas-wrap');
+const guideC   = document.getElementById('guide-canvas');
+const drawC    = document.getElementById('draw-canvas');
+const guideCtx = guideC.getContext('2d');
+const drawCtx  = drawC.getContext('2d');
+
+// Hidden canvas for solid letter (assessment only)
+const tmplC   = document.createElement('canvas');
+const tmplCtx = tmplC.getContext('2d');
+// Must be in the DOM so web fonts render correctly
+tmplC.style.cssText = 'position:fixed;top:-9999px;opacity:0;pointer-events:none;';
+document.body.appendChild(tmplC);
+
+// ── RESIZE ────────────────────────────────────────────────────
+function resize() {
+  const { width: W, height: H } = wrap.getBoundingClientRect();
+  [guideC, drawC, tmplC].forEach(c => { c.width = W; c.height = H; });
+  renderGuide();
+}
+window.addEventListener('resize', () => { resize(); clearDrawing(); });
+
+// ── GUIDE RENDERING ───────────────────────────────────────────
+function renderGuide() {
+  const W = guideC.width, H = guideC.height;
+  if (!W || !H) return;
+
+  const char = items[idx];
+  const fs   = Math.min(W, H) * 0.76;
+  const font = `900 ${fs}px 'Fredoka One', 'Arial Black', Arial`;
+
+  // Solid template on hidden canvas (for pixel-level scoring)
+  tmplCtx.clearRect(0, 0, W, H);
+  tmplCtx.font            = font;
+  tmplCtx.textAlign       = 'center';
+  tmplCtx.textBaseline    = 'middle';
+  tmplCtx.fillStyle       = '#000';
+  tmplCtx.fillText(char, W / 2, H / 2);
+
+  // Visual guide: faint fill + dashed stroke
+  guideCtx.clearRect(0, 0, W, H);
+  guideCtx.font         = font;
+  guideCtx.textAlign    = 'center';
+  guideCtx.textBaseline = 'middle';
+
+  guideCtx.fillStyle = 'rgba(167,139,250,0.17)';
+  guideCtx.fillText(char, W / 2, H / 2);
+
+  guideCtx.strokeStyle = 'rgba(109,40,217,0.5)';
+  guideCtx.lineWidth   = 7;
+  guideCtx.setLineDash([20, 14]);
+  guideCtx.strokeText(char, W / 2, H / 2);
+  guideCtx.setLineDash([]);
+
+  // Instruction badge
+  drawHint(guideCtx, W, H);
+}
+
+function drawHint(ctx, W, H) {
+  const txt    = 'Trace with your finger!';
+  const pad    = 14, r = 18;
+  ctx.font     = `bold ${clamp(14, W * 0.035, 20)}px Nunito, sans-serif`;
+  const tw     = ctx.measureText(txt).width;
+  const bw     = tw + pad * 2;
+  const bh     = r * 2;
+  const bx     = (W - bw) / 2;
+  const by     = H - bh - 14;
+
+  ctx.beginPath();
+  ctx.roundRect(bx, by, bw, bh, r);
+  ctx.fillStyle = 'rgba(139,92,246,0.12)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(139,92,246,0.35)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([]);
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(109,40,217,0.7)';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(txt, W / 2, by + r);
+}
+
+function clamp(min, val, max) { return Math.max(min, Math.min(max, val)); }
+
+// ── DRAWING ───────────────────────────────────────────────────
+function eventPos(e) {
+  const rect = drawC.getBoundingClientRect();
+  const scX  = drawC.width  / rect.width;
+  const scY  = drawC.height / rect.height;
+  const src  = e.touches ? (e.touches[0] || e.changedTouches[0]) : e;
+  return {
+    x: (src.clientX - rect.left) * scX,
+    y: (src.clientY - rect.top)  * scY
+  };
+}
+
+function currentColor() { return COLORS[strokeN % COLORS.length]; }
+
+function onDown(e) {
+  e.preventDefault();
+  drawing = true;
+  strokeN++;
+
+  const col = currentColor();
+  drawCtx.lineWidth   = BRUSH * 2;
+  drawCtx.lineCap     = 'round';
+  drawCtx.lineJoin    = 'round';
+  drawCtx.strokeStyle = col;
+  drawCtx.fillStyle   = col;
+
+  const p = eventPos(e);
+  // Paint starting dot so single taps register
+  drawCtx.beginPath();
+  drawCtx.arc(p.x, p.y, BRUSH, 0, Math.PI * 2);
+  drawCtx.fill();
+
+  drawCtx.beginPath();
+  drawCtx.moveTo(p.x, p.y);
+}
+
+function onMove(e) {
+  e.preventDefault();
+  if (!drawing) return;
+  const p = eventPos(e);
+  drawCtx.lineTo(p.x, p.y);
+  drawCtx.stroke();
+  drawCtx.beginPath();
+  drawCtx.moveTo(p.x, p.y);
+}
+
+function onUp(e) {
+  e.preventDefault();
+  if (!drawing) return;
+  drawing = false;
+  drawCtx.beginPath();
+}
+
+drawC.addEventListener('touchstart', onDown, { passive: false });
+drawC.addEventListener('touchmove',  onMove, { passive: false });
+drawC.addEventListener('touchend',   onUp,   { passive: false });
+drawC.addEventListener('mousedown',  onDown);
+drawC.addEventListener('mousemove',  onMove);
+drawC.addEventListener('mouseup',    onUp);
+drawC.addEventListener('mouseleave', onUp);
+
+// ── CLEAR ─────────────────────────────────────────────────────
+function clearDrawing() {
+  drawCtx.clearRect(0, 0, drawC.width, drawC.height);
+  strokeN = 0;
+}
+
+// ── ASSESSMENT ────────────────────────────────────────────────
+// Algorithm:
+//   1. Downsample both template and drawn canvases to a coarse grid
+//   2. Dilate both grids by brush radius → acceptable zones
+//   3. Coverage  = how much of the template was touched by the drawing
+//   4. Precision = how much of the drawing landed on/near the template
+//   5. Score = 0.65*coverage + 0.35*precision  (generous for toddlers)
+function checkTrace() {
+  const W = drawC.width, H = drawC.height;
+  if (!W || !H) return;
+
+  const STEP = 3; // sample 1 pixel per 3×3 block (fast & accurate enough)
+  const SW = Math.ceil(W / STEP);
+  const SH = Math.ceil(H / STEP);
+  const N  = SW * SH;
+
+  const tPx = tmplCtx.getImageData(0, 0, W, H).data;
+  const dPx = drawCtx.getImageData(0, 0, W, H).data;
+
+  const tGrid = new Uint8Array(N);
+  const dGrid = new Uint8Array(N);
+
+  for (let sy = 0; sy < SH; sy++) {
+    for (let sx = 0; sx < SW; sx++) {
+      let tMax = 0, dMax = 0;
+      for (let dy = 0; dy < STEP; dy++) {
+        for (let dx = 0; dx < STEP; dx++) {
+          const px = sx * STEP + dx, py = sy * STEP + dy;
+          if (px >= W || py >= H) continue;
+          const i = (py * W + px) * 4;
+          tMax = Math.max(tMax, tPx[i + 3]);
+          dMax = Math.max(dMax, dPx[i + 3]);
+        }
+      }
+      tGrid[sy * SW + sx] = tMax > 15 ? 1 : 0;
+      dGrid[sy * SW + sx] = dMax > 15 ? 1 : 0;
+    }
+  }
+
+  const DR = Math.ceil(BRUSH / STEP); // dilation radius in grid units (strict: exactly brush-width tolerance)
+
+  function dilate(grid) {
+    const out = new Uint8Array(N);
+    for (let sy = 0; sy < SH; sy++) {
+      for (let sx = 0; sx < SW; sx++) {
+        if (!grid[sy * SW + sx]) continue;
+        for (let dy = -DR; dy <= DR; dy++) {
+          const ny = sy + dy;
+          if (ny < 0 || ny >= SH) continue;
+          for (let dx = -DR; dx <= DR; dx++) {
+            if (dx * dx + dy * dy > DR * DR) continue;
+            const nx = sx + dx;
+            if (nx >= 0 && nx < SW) out[ny * SW + nx] = 1;
+          }
+        }
+      }
+    }
+    return out;
+  }
+
+  const dDilated = dilate(dGrid); // drawing expanded → used to measure template coverage
+  const tDilated = dilate(tGrid); // template expanded → used to measure drawing precision
+
+  let tTotal = 0, tCovered = 0, dTotal = 0, dInside = 0;
+  for (let i = 0; i < N; i++) {
+    if (tGrid[i]) { tTotal++;  if (dDilated[i]) tCovered++; }
+    if (dGrid[i]) { dTotal++;  if (tDilated[i]) dInside++;  }
+  }
+
+  if (tTotal === 0) {
+    // Template not rendered yet (font race) — re-render and retry once
+    renderGuide();
+    const retryData = tmplCtx.getImageData(0, 0, W, H).data;
+    for (let i = 3; i < retryData.length; i += 4) {
+      if (retryData[i] > 15) { checkTrace(); return; }
+    }
+    return; // font genuinely unavailable — do nothing
+  }
+
+  const coverage  = tCovered / tTotal;
+  const precision = dTotal > 0 ? dInside / dTotal : 0;
+  const score     = 0.60 * coverage + 0.40 * precision;
+
+  console.log(score);
+  let stars;
+  if (dTotal < 150)      stars = 0; // barely touched the screen
+  else if (score < 0.30) stars = 1;
+  else if (score < 0.50) stars = 2;
+  else if (score < 0.65) stars = 3;
+  else if (score < 0.95) stars = 4;
+  else                   stars = 5;
+
+  showResult(stars);
+}
+
+// ── RESULT UI ─────────────────────────────────────────────────
+const RESULTS = [
+  { emoji:'✏️', msg:'Try Again!',     sub:'Draw on the letter and try again.',     color:'#94a3b8' },
+  { emoji:'😬', msg:'Not Quite!',     sub:'Stay closer to the letter.',            color:'#f97316' },
+  { emoji:'😐', msg:'Keep Going!',    sub:'Trace the whole letter to move on.',    color:'#eab308' },
+  { emoji:'😅', msg:'Almost There!',  sub:'Trace more carefully to move on.',      color:'#f59e0b' },
+  { emoji:'🔥', msg:'So Close!',      sub:'Nearly perfect — give it one more try!',color:'#3b82f6' },
+  { emoji:'🏆', msg:'AMAZING!',       sub:'Perfect! You rock! 🎊',                color:'#a855f7' },
+];
+
+function showResult(stars) {
+  if (stars < 5) {
+    playSound('error');
+    shakeCanvas();
+    clearDrawing();
+    return;
+  }
+
+  done.add(idx);
+  updateDots();
+
+  const r = RESULTS[5];
+  document.getElementById('r-emoji').textContent   = r.emoji;
+  document.getElementById('r-msg').textContent     = r.msg;
+  document.getElementById('r-msg').style.color     = r.color;
+  document.getElementById('r-sub').textContent     = r.sub;
+
+  const row = document.getElementById('r-stars');
+  row.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const s = document.createElement('span');
+    s.className = 'star-item';
+    s.textContent = '⭐';
+    s.style.animationDelay = `${i * 0.12}s`;
+    s.style.color = '#facc15';
+    row.appendChild(s);
+  }
+
+  document.getElementById('result-overlay').classList.add('active');
+  playSound('win');
+  launchConfetti();
+}
+
+function tryAgain() {
+  document.getElementById('result-overlay').classList.remove('active');
+  clearDrawing();
+}
+
+function nextChar() {
+  document.getElementById('result-overlay').classList.remove('active');
+  idx = (idx + 1) % items.length;
+  loadChar();
+}
+
+// ── SOUND ─────────────────────────────────────────────────────
+let actx;
+function getACtx() {
+  if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+  return actx;
+}
+
+function tone(freq, start, dur) {
+  try {
+    const ctx = getACtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.22, ctx.currentTime + start);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
+    osc.start(ctx.currentTime + start);
+    osc.stop(ctx.currentTime  + start + dur + 0.05);
+  } catch (_) {}
+}
+
+function buzz(freq, start, dur) {
+  try {
+    const ctx = getACtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.18, ctx.currentTime + start);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
+    osc.start(ctx.currentTime + start);
+    osc.stop(ctx.currentTime  + start + dur + 0.05);
+  } catch (_) {}
+}
+
+function playSound(type) {
+  if (type === 'win')   { tone(523,.00,.12); tone(659,.13,.12); tone(784,.26,.12); tone(1047,.39,.3); }
+  else if (type === 'error') { buzz(220,.00,.14); buzz(175,.15,.28); }
+}
+
+function shakeCanvas() {
+  const el = document.getElementById('canvas-wrap');
+  el.classList.remove('shake');
+  void el.offsetWidth; // force reflow so re-adding the class re-triggers the animation
+  el.classList.add('shake');
+  el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+}
+
+// ── CONFETTI ──────────────────────────────────────────────────
+function launchConfetti() {
+  const palette = ['#f87171','#fde047','#4ade80','#60a5fa','#c084fc','#fb923c','#34d399'];
+  for (let i = 0; i < 75; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetto';
+      const size = 10 + Math.random() * 14;
+      el.style.cssText = `
+        left: ${Math.random() * 100}vw;
+        top: -50px;
+        width: ${size}px;
+        height: ${size}px;
+        background: ${palette[Math.floor(Math.random() * palette.length)]};
+        border-radius: ${Math.random() > 0.5 ? '50%' : '3px'};
+        animation-duration: ${1.8 + Math.random() * 2}s;
+        animation-delay: ${Math.random() * 0.7}s;
+      `;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 5000);
+    }, i * 22);
+  }
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────
+function startMode(m) {
+  mode  = m;
+  items = m === 'letters' ? LETTERS : NUMBERS;
+  idx   = 0;
+  done.clear();
+
+  document.getElementById('welcome').classList.remove('active');
+  document.getElementById('tracing').classList.add('active');
+
+  buildDots();
+  setLabel();
+
+  // Wait for layout + fonts before rendering
+  document.fonts.ready.then(() => {
+    resize();
+  });
+}
+
+function setLabel() {
+  const label = mode === 'letters'
+    ? `Trace the letter ${items[idx]}`
+    : `Trace the number ${items[idx]}`;
+  document.getElementById('char-label').textContent = label;
+}
+
+function loadChar() {
+  clearDrawing();
+  setLabel();
+  renderGuide();
+  updateDots();
+}
+
+function skipCurrent() {
+  idx = (idx + 1) % items.length;
+  loadChar();
+}
+
+function goHome() {
+  document.getElementById('tracing').classList.remove('active');
+  document.getElementById('welcome').classList.add('active');
+}
+
+// ── PROGRESS DOTS ─────────────────────────────────────────────
+function buildDots() {
+  const row = document.getElementById('progress-row');
+  row.innerHTML = items.map((_, i) => `<div class="dot" id="d${i}"></div>`).join('');
+  updateDots();
+}
+
+function updateDots() {
+  items.forEach((_, i) => {
+    const d = document.getElementById(`d${i}`);
+    if (!d) return;
+    d.className = 'dot' + (done.has(i) ? ' done' : i === idx ? ' current' : '');
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+// Block native scroll/zoom on touch
+document.addEventListener('touchmove',  e => e.preventDefault(), { passive: false });
+document.addEventListener('touchstart', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+</script>
+</body>
+</html>
