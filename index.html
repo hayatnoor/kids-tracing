@@ -127,6 +127,7 @@
     /* Canvas area */
     .canvas-wrap {
       flex: 1;
+      max-height: 58vh;
       position: relative;
       margin: 0 12px;
       border-radius: 28px;
@@ -572,7 +573,6 @@ function checkTrace() {
   const precision = dTotal > 0 ? dInside / dTotal : 0;
   const score     = 0.60 * coverage + 0.40 * precision;
 
-  console.log(score);
   let stars;
   if (dTotal < 150)      stars = 0; // barely touched the screen
   else if (score < 0.30) stars = 1;
