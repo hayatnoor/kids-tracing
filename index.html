@@ -359,7 +359,7 @@ function resize() {
   const dpr = window.devicePixelRatio || 1;
   canvasW = W;
   canvasH = H;
-  [guideC, drawC, tmplC].forEach(c => { c.width = W * dpr; c.height = H * dpr; });
+  [guideC, drawC, tmplC].forEach(c => { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); });
   [guideCtx, drawCtx, tmplCtx].forEach(ctx => ctx.setTransform(dpr, 0, 0, dpr, 0, 0));
   renderGuide();
 }
