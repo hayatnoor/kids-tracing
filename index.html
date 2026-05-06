@@ -100,6 +100,7 @@
     .green   { background: #4ade80; color: #14532d; }
     .red     { background: #f87171; color: white;   }
     .blue    { background: #60a5fa; color: white;   }
+    .purple  { background: #a78bfa; color: white;   }
     .white   { background: white;   color: #555;    }
 
     /* ── TRACING SCREEN ── */
@@ -273,17 +274,107 @@
       0%   { transform: translateY(-80px) rotate(0deg);   opacity: 1; }
       100% { transform: translateY(110vh)  rotate(720deg); opacity: 0; }
     }
+
+    /* ── MATH SCREEN ── */
+    #math-screen {
+      height: 100vh;
+      flex-direction: column;
+      background: linear-gradient(160deg, #fef9c3 0%, #bbf7d0 100%);
+    }
+
+    #math-screen .char-label { color: #365314; }
+
+    .math-display {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 0 20px;
+      min-height: 0;
+      background: white;
+      margin: 0 12px;
+      border-radius: 28px;
+      box-shadow: 0 8px 32px rgba(80, 140, 80, 0.18);
+    }
+
+    .math-emoji-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .math-emoji-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 4px;
+      font-size: clamp(1.8rem, 6.5vw, 3.2rem);
+      max-width: 88vw;
+      line-height: 1.3;
+    }
+
+    .math-op-label {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1rem, 3.5vw, 1.4rem);
+      color: #6b7280;
+    }
+
+    .math-equation {
+      font-size: clamp(2.8rem, 11vw, 5.5rem);
+      color: #365314;
+      letter-spacing: 0.06em;
+      line-height: 1;
+    }
+
+    .math-choices {
+      display: flex;
+      gap: clamp(10px, 3vw, 22px);
+      justify-content: center;
+      padding: 14px 16px 20px;
+      flex-shrink: 0;
+    }
+
+    .choice-btn {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(2.2rem, 9vw, 4rem);
+      width: clamp(82px, 25vw, 140px);
+      height: clamp(82px, 25vw, 140px);
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 0 rgba(0,0,0,0.18);
+      transition: transform 80ms, box-shadow 80ms;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .choice-btn:active {
+      transform: translateY(4px) !important;
+      box-shadow: none !important;
+    }
+    .choice-btn:disabled {
+      opacity: 0.55;
+      cursor: default;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
 
 <!-- ═══════════════ WELCOME ═══════════════ -->
 <div id="welcome" class="screen active">
-  <div class="welcome-title">✏️<br>Let's Trace!</div>
+  <div class="welcome-title">✏️<br>Let's Learn!</div>
   <div class="welcome-sub">Choose what to practice 👇</div>
   <div class="choice-row">
     <button class="btn btn-xl yellow" onclick="startMode('letters')">🔤 Letters</button>
     <button class="btn btn-xl green"  onclick="startMode('numbers')">🔢 Numbers</button>
+    <button class="btn btn-xl" style="background:#fb923c;color:#7c2d12;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="startMath()">🧮 Math</button>
   </div>
 </div>
 
@@ -308,6 +399,21 @@
   </div>
 </div>
 
+<!-- ═══════════════ MATH ═══════════════ -->
+<div id="math-screen" class="screen">
+  <div class="top-bar">
+    <button class="btn btn-icon white" onclick="goHome()" title="Home">🏠</button>
+    <div class="char-label" id="math-label">Question 1 of 10</div>
+    <div style="width:52px;flex-shrink:0"></div>
+  </div>
+
+  <div class="math-display" id="math-display"></div>
+
+  <div class="math-choices" id="math-choices"></div>
+
+  <div class="progress-row" id="math-progress-row"></div>
+</div>
+
 <!-- ═══════════════ RESULT OVERLAY ═══════════════ -->
 <div id="result-overlay">
   <div class="result-card">
@@ -316,8 +422,8 @@
     <div class="result-sub" id="r-sub">You traced it perfectly!</div>
     <div class="stars-row"  id="r-stars"></div>
     <div class="result-btns">
-      <button class="btn btn-lg red"  onclick="tryAgain()">🔄 Try Again</button>
-      <button id="btn-next" class="btn btn-lg blue" onclick="nextChar()">Next ▶</button>
+      <button id="btn-try-again" class="btn btn-lg red"  onclick="tryAgain()">🔄 Try Again</button>
+      <button id="btn-next"      class="btn btn-lg blue" onclick="nextChar()">Next ▶</button>
     </div>
   </div>
 </div>
@@ -328,7 +434,7 @@
 // ── CONSTANTS ──────────────────────────────────────────────────
 const LETTERS = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
 const NUMBERS = [...'0123456789'];
-const BRUSH   = 26;  // finger brush radius (px)
+const BRUSH   = 26;
 const COLORS  = ['#f87171','#fb923c','#facc15','#4ade80','#38bdf8','#a78bfa','#f472b6'];
 
 // ── STATE ──────────────────────────────────────────────────────
@@ -338,7 +444,7 @@ let idx     = 0;
 let drawing = false;
 let strokeN = 0;
 let done    = new Set();
-let canvasW = 0, canvasH = 0; // CSS-pixel dimensions of the canvas
+let canvasW = 0, canvasH = 0;
 
 // ── CANVAS REFS ────────────────────────────────────────────────
 const wrap     = document.getElementById('canvas-wrap');
@@ -347,10 +453,8 @@ const drawC    = document.getElementById('draw-canvas');
 const guideCtx = guideC.getContext('2d');
 const drawCtx  = drawC.getContext('2d');
 
-// Hidden canvas for solid letter (assessment only)
 const tmplC   = document.createElement('canvas');
 const tmplCtx = tmplC.getContext('2d');
-// Must be in the DOM so web fonts render correctly
 tmplC.style.cssText = 'position:fixed;top:-9999px;opacity:0;pointer-events:none;';
 document.body.appendChild(tmplC);
 
@@ -380,7 +484,6 @@ function renderGuide() {
   const fs   = Math.round(Math.min(W, H) * 0.76);
   const font = `900 ${fs}px 'Nunito', 'Arial Black', Arial`;
 
-  // Solid template on hidden canvas (for pixel-level scoring)
   tmplCtx.clearRect(0, 0, W, H);
   tmplCtx.font            = font;
   tmplCtx.textAlign       = 'center';
@@ -388,7 +491,6 @@ function renderGuide() {
   tmplCtx.fillStyle       = '#000';
   tmplCtx.fillText(char, W / 2, H / 2);
 
-  // Visual guide: single faint fill
   guideCtx.clearRect(0, 0, W, H);
   guideCtx.font         = font;
   guideCtx.textAlign    = 'center';
@@ -432,7 +534,6 @@ function onDown(e) {
   drawCtx.fillStyle   = col;
 
   const p = eventPos(e);
-  // Paint starting dot so single taps register
   drawCtx.beginPath();
   drawCtx.arc(p.x, p.y, BRUSH, 0, Math.PI * 2);
   drawCtx.fill();
@@ -473,17 +574,11 @@ function clearDrawing() {
 }
 
 // ── ASSESSMENT ────────────────────────────────────────────────
-// Algorithm:
-//   1. Downsample both template and drawn canvases to a coarse grid
-//   2. Dilate both grids by brush radius → acceptable zones
-//   3. Coverage  = how much of the template was touched by the drawing
-//   4. Precision = how much of the drawing landed on/near the template
-//   5. Score = 0.65*coverage + 0.35*precision  (generous for toddlers)
 function checkTrace() {
   const W = drawC.width, H = drawC.height;
   if (!W || !H) return;
 
-  const STEP = 3; // sample 1 pixel per 3×3 block (fast & accurate enough)
+  const STEP = 3;
   const SW = Math.ceil(W / STEP);
   const SH = Math.ceil(H / STEP);
   const N  = SW * SH;
@@ -511,7 +606,7 @@ function checkTrace() {
     }
   }
 
-  const DR = Math.ceil(BRUSH * (window.devicePixelRatio || 1) / STEP); // dilation radius in grid units
+  const DR = Math.ceil(BRUSH * (window.devicePixelRatio || 1) / STEP);
 
   function dilate(grid) {
     const out = new Uint8Array(N);
@@ -532,8 +627,8 @@ function checkTrace() {
     return out;
   }
 
-  const dDilated = dilate(dGrid); // drawing expanded → used to measure template coverage
-  const tDilated = dilate(tGrid); // template expanded → used to measure drawing precision
+  const dDilated = dilate(dGrid);
+  const tDilated = dilate(tGrid);
 
   let tTotal = 0, tCovered = 0, dTotal = 0, dInside = 0;
   for (let i = 0; i < N; i++) {
@@ -542,13 +637,12 @@ function checkTrace() {
   }
 
   if (tTotal === 0) {
-    // Template not rendered yet (font race) — re-render and retry once
     renderGuide();
     const retryData = tmplCtx.getImageData(0, 0, W, H).data;
     for (let i = 3; i < retryData.length; i += 4) {
       if (retryData[i] > 15) { checkTrace(); return; }
     }
-    return; // font genuinely unavailable — do nothing
+    return;
   }
 
   const coverage  = tCovered / tTotal;
@@ -556,7 +650,7 @@ function checkTrace() {
   const score     = 0.60 * coverage + 0.40 * precision;
 
   let stars;
-  if (dTotal < 150)      stars = 0; // barely touched the screen
+  if (dTotal < 150)      stars = 0;
   else if (score < 0.30) stars = 1;
   else if (score < 0.50) stars = 2;
   else if (score < 0.65) stars = 3;
@@ -587,6 +681,9 @@ function showResult(stars) {
   done.add(idx);
   updateDots();
 
+  document.getElementById('btn-try-again').textContent = '🔄 Try Again';
+  document.getElementById('btn-next').textContent      = 'Next ▶';
+
   const r = RESULTS[5];
   document.getElementById('r-emoji').textContent   = r.emoji;
   document.getElementById('r-msg').textContent     = r.msg;
@@ -611,13 +708,21 @@ function showResult(stars) {
 
 function tryAgain() {
   document.getElementById('result-overlay').classList.remove('active');
-  clearDrawing();
+  if (mode === 'math') {
+    goHome();
+  } else {
+    clearDrawing();
+  }
 }
 
 function nextChar() {
   document.getElementById('result-overlay').classList.remove('active');
-  idx = (idx + 1) % items.length;
-  loadChar();
+  if (mode === 'math') {
+    startMath();
+  } else {
+    idx = (idx + 1) % items.length;
+    loadChar();
+  }
 }
 
 // ── SOUND ─────────────────────────────────────────────────────
@@ -667,7 +772,7 @@ function playSound(type) {
 function shakeCanvas() {
   const el = document.getElementById('canvas-wrap');
   el.classList.remove('shake');
-  void el.offsetWidth; // force reflow so re-adding the class re-triggers the animation
+  void el.offsetWidth;
   el.classList.add('shake');
   el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
 }
@@ -709,10 +814,7 @@ function startMode(m) {
   buildDots();
   setLabel();
 
-  // Wait for layout + fonts before rendering
-  document.fonts.ready.then(() => {
-    resize();
-  });
+  document.fonts.ready.then(() => { resize(); });
 }
 
 function setLabel() {
@@ -735,7 +837,9 @@ function skipCurrent() {
 }
 
 function goHome() {
+  document.getElementById('result-overlay').classList.remove('active');
   document.getElementById('tracing').classList.remove('active');
+  document.getElementById('math-screen').classList.remove('active');
   document.getElementById('welcome').classList.add('active');
 }
 
@@ -754,8 +858,166 @@ function updateDots() {
   });
 }
 
+// ── MATH MODE ─────────────────────────────────────────────────
+const MATH_TOTAL = 10;
+const MATH_EMOJI = ['⭐','🍎','🐶','🦋','🎈','🐠','🍭','🐸','🌸','🏀'];
+
+let mathCorrect    = 0;
+let mathQuestion   = 0;
+let currentProblem = null;
+
+function startMath() {
+  mode         = 'math';
+  mathCorrect  = 0;
+  mathQuestion = 0;
+
+  document.getElementById('welcome').classList.remove('active');
+  document.getElementById('math-screen').classList.add('active');
+
+  buildMathDots();
+  nextMathProblem();
+}
+
+function generateProblem() {
+  const emoji = MATH_EMOJI[Math.floor(Math.random() * MATH_EMOJI.length)];
+  const isAdd = Math.random() > 0.35;
+
+  let a, b, answer, op;
+  if (isAdd) {
+    a = Math.floor(Math.random() * 5) + 1; // 1–5
+    b = Math.floor(Math.random() * 5) + 1; // 1–5
+    while (a + b > 10) b = Math.floor(Math.random() * 5) + 1;
+    answer = a + b;
+    op = '+';
+  } else {
+    a = Math.floor(Math.random() * 7) + 3;               // 3–9
+    b = Math.floor(Math.random() * Math.min(a - 1, 4)) + 1; // 1–min(a-1, 4)
+    answer = a - b;
+    op = '−';
+  }
+
+  // Two wrong choices close to the correct answer
+  const wrongs = new Set();
+  let tries = 0;
+  while (wrongs.size < 2 && tries < 60) {
+    tries++;
+    const d = Math.floor(Math.random() * 3) + 1;
+    const w = answer + (Math.random() > 0.5 ? d : -d);
+    if (w !== answer && w >= 0 && w <= 10) wrongs.add(w);
+  }
+  for (let n = 0; n <= 10 && wrongs.size < 2; n++) {
+    if (n !== answer) wrongs.add(n);
+  }
+
+  const choices = [answer, ...[...wrongs].slice(0, 2)].sort(() => Math.random() - 0.5);
+  return { a, b, answer, op, choices, emoji };
+}
+
+function nextMathProblem() {
+  mathQuestion++;
+  document.getElementById('math-label').textContent = `Question ${mathQuestion} of ${MATH_TOTAL}`;
+  currentProblem = generateProblem();
+  renderMathProblem();
+}
+
+function renderMathProblem() {
+  const { a, b, op, choices, emoji } = currentProblem;
+  const display = document.getElementById('math-display');
+
+  const makeRow = n => Array(n).fill(`<span>${emoji}</span>`).join('');
+
+  let emojiHTML;
+  if (op === '+') {
+    emojiHTML = `
+      <div class="math-emoji-group">
+        <div class="math-emoji-row">${makeRow(a)}</div>
+        <div class="math-op-label">plus</div>
+        <div class="math-emoji-row">${makeRow(b)}</div>
+      </div>`;
+  } else {
+    emojiHTML = `
+      <div class="math-emoji-group">
+        <div class="math-emoji-row">${makeRow(a)}</div>
+        <div class="math-op-label">take away ${b}</div>
+      </div>`;
+  }
+
+  display.innerHTML = `${emojiHTML}<div class="math-equation">${a} ${op} ${b} = ?</div>`;
+
+  const btnColors = ['yellow', 'blue', 'green'];
+  const shuffledColors = [...btnColors].sort(() => Math.random() - 0.5);
+  document.getElementById('math-choices').innerHTML = choices.map((c, i) =>
+    `<button class="btn choice-btn ${shuffledColors[i]}" onclick="checkMathAnswer(${c})">${c}</button>`
+  ).join('');
+}
+
+function checkMathAnswer(answer) {
+  if (answer === currentProblem.answer) {
+    mathCorrect++;
+    updateMathDots();
+    playSound('win');
+    launchConfetti();
+
+    document.querySelectorAll('.choice-btn').forEach(b => { b.disabled = true; });
+
+    if (mathCorrect >= MATH_TOTAL) {
+      setTimeout(showMathComplete, 900);
+    } else {
+      setTimeout(nextMathProblem, 1100);
+    }
+  } else {
+    playSound('error');
+    const display = document.getElementById('math-display');
+    display.classList.remove('shake');
+    void display.offsetWidth;
+    display.classList.add('shake');
+    display.addEventListener('animationend', () => display.classList.remove('shake'), { once: true });
+  }
+}
+
+function showMathComplete() {
+  document.getElementById('r-emoji').textContent        = '🏆';
+  document.getElementById('r-msg').textContent          = 'Math Star!';
+  document.getElementById('r-msg').style.color          = '#a855f7';
+  document.getElementById('r-sub').textContent          = `You solved all ${MATH_TOTAL} problems! Amazing!`;
+  document.getElementById('btn-try-again').textContent  = '🏠 Home';
+  document.getElementById('btn-next').textContent       = '🔄 Play Again';
+
+  const row = document.getElementById('r-stars');
+  row.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const s = document.createElement('span');
+    s.className = 'star-item';
+    s.textContent = '⭐';
+    s.style.animationDelay = `${i * 0.12}s`;
+    s.style.color = '#facc15';
+    row.appendChild(s);
+  }
+
+  document.getElementById('result-overlay').classList.add('active');
+  playSound('win');
+  launchConfetti();
+}
+
+function buildMathDots() {
+  const row = document.getElementById('math-progress-row');
+  row.innerHTML = Array.from({ length: MATH_TOTAL }, (_, i) =>
+    `<div class="dot" id="md${i}"></div>`
+  ).join('');
+  updateMathDots();
+}
+
+function updateMathDots() {
+  for (let i = 0; i < MATH_TOTAL; i++) {
+    const d = document.getElementById(`md${i}`);
+    if (!d) return;
+    if (i < mathCorrect)      d.className = 'dot done';
+    else if (i === mathCorrect) d.className = 'dot current';
+    else                       d.className = 'dot';
+  }
+}
+
 // ── INIT ──────────────────────────────────────────────────────
-// Block native scroll/zoom on touch
 document.addEventListener('touchmove',  e => e.preventDefault(), { passive: false });
 document.addEventListener('touchstart', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 </script>
