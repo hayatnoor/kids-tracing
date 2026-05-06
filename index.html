@@ -68,6 +68,7 @@
       border-radius: 999px;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
       transition: transform 80ms, box-shadow 80ms;
       white-space: nowrap;
       letter-spacing: 0.02em;
@@ -402,34 +403,6 @@ function renderGuide() {
   guideCtx.setLineDash([fs * 0.04, fs * 0.025]);
   guideCtx.strokeText(char, W / 2, H / 2);
   guideCtx.setLineDash([]);
-
-  // Instruction badge
-  drawHint(guideCtx, W, H);
-}
-
-function drawHint(ctx, W, H) {
-  const txt    = 'Trace with your finger!';
-  const pad    = 14, r = 18;
-  ctx.font     = `bold ${clamp(14, W * 0.035, 20)}px Nunito, sans-serif`;
-  const tw     = ctx.measureText(txt).width;
-  const bw     = tw + pad * 2;
-  const bh     = r * 2;
-  const bx     = (W - bw) / 2;
-  const by     = H - bh - 14;
-
-  ctx.beginPath();
-  ctx.roundRect(bx, by, bw, bh, r);
-  ctx.fillStyle = 'rgba(139,92,246,0.12)';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(139,92,246,0.35)';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([]);
-  ctx.stroke();
-
-  ctx.fillStyle = 'rgba(109,40,217,0.7)';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(txt, W / 2, by + r);
 }
 
 function clamp(min, val, max) { return Math.max(min, Math.min(max, val)); }
