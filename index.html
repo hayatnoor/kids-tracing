@@ -377,7 +377,7 @@ function renderGuide() {
 
   const char = items[idx];
   const fs   = Math.round(Math.min(W, H) * 0.76);
-  const font = `900 ${fs}px 'Fredoka One', 'Arial Black', Arial`;
+  const font = `900 ${fs}px 'Nunito', 'Arial Black', Arial`;
 
   // Solid template on hidden canvas (for pixel-level scoring)
   tmplCtx.clearRect(0, 0, W, H);
@@ -395,6 +395,13 @@ function renderGuide() {
 
   guideCtx.fillStyle = 'rgba(109,40,217,0.18)';
   guideCtx.fillText(char, W / 2, H / 2);
+
+  guideCtx.strokeStyle = 'rgba(109,40,217,0.45)';
+  guideCtx.lineWidth   = Math.max(2, fs * 0.012);
+  guideCtx.lineJoin    = 'round';
+  guideCtx.setLineDash([fs * 0.04, fs * 0.025]);
+  guideCtx.strokeText(char, W / 2, H / 2);
+  guideCtx.setLineDash([]);
 
   // Instruction badge
   drawHint(guideCtx, W, H);
