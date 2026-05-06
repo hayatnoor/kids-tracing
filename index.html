@@ -297,6 +297,7 @@
       margin: 0 12px;
       border-radius: 28px;
       box-shadow: 0 8px 32px rgba(80, 140, 80, 0.18);
+      max-height: 50vh;
     }
 
     .math-emoji-group {
@@ -435,14 +436,13 @@
 const LETTERS = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
 const NUMBERS = [...'0123456789'];
 const BRUSH   = 26;
-const COLORS  = ['#f87171','#fb923c','#facc15','#4ade80','#38bdf8','#a78bfa','#f472b6'];
+const DRAW_COLOR = '#7c3aed';
 
 // ── STATE ──────────────────────────────────────────────────────
 let mode    = 'letters';
 let items   = LETTERS;
 let idx     = 0;
 let drawing = false;
-let strokeN = 0;
 let done    = new Set();
 let canvasW = 0, canvasH = 0;
 
@@ -519,14 +519,11 @@ function eventPos(e) {
   };
 }
 
-function currentColor() { return COLORS[strokeN % COLORS.length]; }
-
 function onDown(e) {
   e.preventDefault();
   drawing = true;
-  strokeN++;
 
-  const col = currentColor();
+  const col = DRAW_COLOR;
   drawCtx.lineWidth   = BRUSH * 2;
   drawCtx.lineCap     = 'round';
   drawCtx.lineJoin    = 'round';
@@ -570,7 +567,6 @@ drawC.addEventListener('mouseleave', onUp);
 // ── CLEAR ─────────────────────────────────────────────────────
 function clearDrawing() {
   drawCtx.clearRect(0, 0, canvasW, canvasH);
-  strokeN = 0;
 }
 
 // ── ASSESSMENT ────────────────────────────────────────────────
