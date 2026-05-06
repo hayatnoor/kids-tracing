@@ -356,10 +356,15 @@ document.body.appendChild(tmplC);
 // ── RESIZE ────────────────────────────────────────────────────
 function resize() {
   const { width: W, height: H } = wrap.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
+  const dpr = Math.ceil(window.devicePixelRatio) || 1;
   canvasW = W;
   canvasH = H;
-  [guideC, drawC, tmplC].forEach(c => { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); });
+  [guideC, drawC, tmplC].forEach(c => {
+    c.width        = W * dpr;
+    c.height       = H * dpr;
+    c.style.width  = `${W}px`;
+    c.style.height = `${H}px`;
+  });
   [guideCtx, drawCtx, tmplCtx].forEach(ctx => ctx.setTransform(dpr, 0, 0, dpr, 0, 0));
   renderGuide();
 }
@@ -371,7 +376,7 @@ function renderGuide() {
   if (!W || !H) return;
 
   const char = items[idx];
-  const fs   = Math.min(W, H) * 0.76;
+  const fs   = Math.round(Math.min(W, H) * 0.76);
   const font = `900 ${fs}px 'Fredoka One', 'Arial Black', Arial`;
 
   // Solid template on hidden canvas (for pixel-level scoring)
