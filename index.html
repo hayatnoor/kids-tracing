@@ -384,6 +384,7 @@
       border-radius: 28px;
       box-shadow: 0 8px 32px rgba(219,39,119,0.13);
       min-height: 0;
+      max-height: 60vh;
     }
 
     .listen-btn {
@@ -968,14 +969,18 @@ function updateDots() {
 const MATH_TOTAL = 10;
 const MATH_EMOJI = ['⭐','🍎','🐶','🦋','🎈','🐠','🍭','🐸','🌸','🏀'];
 
-let mathCorrect    = 0;
-let mathQuestion   = 0;
-let currentProblem = null;
+let mathCorrect         = 0;
+let mathQuestion        = 0;
+let currentProblem      = null;
+let mathAttempts        = [];
+let mathCurrentAttempts = 0;
 
 function startMath() {
   mode         = 'math';
-  mathCorrect  = 0;
-  mathQuestion = 0;
+  mathCorrect         = 0;
+  mathQuestion        = 0;
+  mathAttempts        = [];
+  mathCurrentAttempts = 0;
 
   document.getElementById('welcome').classList.remove('active');
   document.getElementById('math-screen').classList.add('active');
@@ -1020,6 +1025,7 @@ function generateProblem() {
 }
 
 function nextMathProblem() {
+  mathCurrentAttempts = 0;
   mathQuestion++;
   document.getElementById('math-label').textContent = `Question ${mathQuestion} of ${MATH_TOTAL}`;
   currentProblem = generateProblem();
@@ -1059,6 +1065,7 @@ function renderMathProblem() {
 
 function checkMathAnswer(answer) {
   if (answer === currentProblem.answer) {
+    mathAttempts.push(mathCurrentAttempts);
     mathCorrect++;
     updateMathDots();
     playSound('win');
@@ -1072,6 +1079,7 @@ function checkMathAnswer(answer) {
       setTimeout(nextMathProblem, 1100);
     }
   } else {
+    mathCurrentAttempts++;
     playSound('error');
     const display = document.getElementById('math-display');
     display.classList.remove('shake');
@@ -1082,10 +1090,20 @@ function checkMathAnswer(answer) {
 }
 
 function showMathComplete() {
+  const firstTry = mathAttempts.filter(a => a === 0).length;
+  const stars = firstTry >= 10 ? 5
+              : firstTry >= 8  ? 4
+              : firstTry >= 6  ? 3
+              : firstTry >= 4  ? 2
+              : 1;
+  const subText = firstTry === MATH_TOTAL
+    ? `Perfect! All ${MATH_TOTAL} problems on the first try! 🎊`
+    : `${firstTry} out of ${MATH_TOTAL} on your first try!`;
+
   document.getElementById('r-emoji').textContent        = '🏆';
   document.getElementById('r-msg').textContent          = 'Math Star!';
   document.getElementById('r-msg').style.color          = '#a855f7';
-  document.getElementById('r-sub').textContent          = `You solved all ${MATH_TOTAL} problems! Amazing!`;
+  document.getElementById('r-sub').textContent          = subText;
   document.getElementById('btn-try-again').textContent  = '🏠 Home';
   document.getElementById('btn-next').textContent       = '🔄 Play Again';
 
@@ -1094,9 +1112,9 @@ function showMathComplete() {
   for (let i = 0; i < 5; i++) {
     const s = document.createElement('span');
     s.className = 'star-item';
-    s.textContent = '⭐';
+    s.textContent = i < stars ? '⭐' : '☆';
     s.style.animationDelay = `${i * 0.12}s`;
-    s.style.color = '#facc15';
+    s.style.color = i < stars ? '#facc15' : '#d1d5db';
     row.appendChild(s);
   }
 
@@ -1134,16 +1152,20 @@ const SIGHT_WORDS = [
 ];
 
 const SIGHT_TOTAL = 10;
-let sightDone     = 0;
-let sightQuestion = 0;
-let currentWord   = null;
-let sightUsed     = [];
+let sightDone            = 0;
+let sightQuestion        = 0;
+let currentWord          = null;
+let sightUsed            = [];
+let sightAttempts        = []; // wrong-answer count per question
+let sightCurrentAttempts = 0;
 
 function startSight() {
   mode          = 'sight';
-  sightDone     = 0;
-  sightQuestion = 0;
-  sightUsed     = [];
+  sightDone            = 0;
+  sightQuestion        = 0;
+  sightUsed            = [];
+  sightAttempts        = [];
+  sightCurrentAttempts = 0;
 
   document.getElementById('welcome').classList.remove('active');
   document.getElementById('sight-screen').classList.add('active');
@@ -1154,6 +1176,7 @@ function startSight() {
 
 function nextSightWord() {
   sightQuestion++;
+  sightCurrentAttempts = 0;
   document.getElementById('sight-label').textContent = `Word ${sightQuestion} of ${SIGHT_TOTAL}`;
 
   const available = SIGHT_WORDS.filter(w => !sightUsed.includes(w));
@@ -1204,6 +1227,7 @@ function checkSightAnswer(word) {
       c.disabled = true;
       if (c.textContent.trim() === word) c.classList.add('correct');
     });
+    sightAttempts.push(sightCurrentAttempts);
     sightDone++;
     updateSightDots();
     playSound('win');
@@ -1215,6 +1239,7 @@ function checkSightAnswer(word) {
       setTimeout(nextSightWord, 1200);
     }
   } else {
+    sightCurrentAttempts++;
     playSound('error');
     cards.forEach(c => {
       if (c.textContent.trim() !== word) return;
@@ -1233,10 +1258,20 @@ function checkSightAnswer(word) {
 }
 
 function showSightComplete() {
+  const firstTry = sightAttempts.filter(a => a === 0).length;
+  const stars = firstTry >= 10 ? 5
+              : firstTry >= 8  ? 4
+              : firstTry >= 6  ? 3
+              : firstTry >= 4  ? 2
+              : 1;
+  const subText = firstTry === SIGHT_TOTAL
+    ? `Perfect! All ${SIGHT_TOTAL} words on the first try! 🎊`
+    : `${firstTry} out of ${SIGHT_TOTAL} on your first try!`;
+
   document.getElementById('r-emoji').textContent       = '📚';
   document.getElementById('r-msg').textContent         = 'Word Star!';
   document.getElementById('r-msg').style.color         = '#db2777';
-  document.getElementById('r-sub').textContent         = `You read all ${SIGHT_TOTAL} sight words! Amazing!`;
+  document.getElementById('r-sub').textContent         = subText;
   document.getElementById('btn-try-again').textContent = '🏠 Home';
   document.getElementById('btn-next').textContent      = '🔄 Play Again';
 
@@ -1245,9 +1280,9 @@ function showSightComplete() {
   for (let i = 0; i < 5; i++) {
     const s = document.createElement('span');
     s.className = 'star-item';
-    s.textContent = '⭐';
+    s.textContent = i < stars ? '⭐' : '☆';
     s.style.animationDelay = `${i * 0.12}s`;
-    s.style.color = '#facc15';
+    s.style.color = i < stars ? '#facc15' : '#d1d5db';
     row.appendChild(s);
   }
 
