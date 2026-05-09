@@ -103,6 +103,29 @@
     .purple  { background: #a78bfa; color: white;   }
     .white   { background: white;   color: #555;    }
 
+    /* ── MODE SELECT ── */
+    #mode-select {
+      height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      background: linear-gradient(160deg, #6ee7f7 0%, #818cf8 100%);
+    }
+
+    .mode-select-emoji {
+      font-size: clamp(3rem, 12vw, 5.5rem);
+      animation: float 2.2s ease-in-out infinite alternate;
+    }
+
+    .mode-select-title {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1.3rem, 4.5vw, 2.2rem);
+      color: rgba(255,255,255,0.92);
+      text-align: center;
+    }
+
     /* ── TRACING SCREEN ── */
     #tracing {
       height: 100vh;
@@ -469,6 +492,17 @@
   </div>
 </div>
 
+<!-- ═══════════════ MODE SELECT ═══════════════ -->
+<div id="mode-select" class="screen">
+  <div class="mode-select-emoji" id="mode-select-emoji">🔤</div>
+  <div class="mode-select-title">How do you want to practice?</div>
+  <div class="choice-row">
+    <button class="btn btn-xl yellow" onclick="startSubMode('tracing')">✏️ Trace it</button>
+    <button class="btn btn-xl blue"   onclick="startSubMode('writing')">🖊️ Write it</button>
+  </div>
+  <button class="btn btn-lg white" onclick="goHome()" style="box-shadow:0 5px 0 rgba(0,0,0,0.12);">← Back</button>
+</div>
+
 <!-- ═══════════════ TRACING ═══════════════ -->
 <div id="tracing" class="screen">
   <div class="top-bar">
@@ -547,6 +581,7 @@ const DRAW_COLOR = '#7c3aed';
 
 // ── STATE ──────────────────────────────────────────────────────
 let mode    = 'letters';
+let submode = 'tracing'; // 'tracing' | 'writing'
 let items   = LETTERS;
 let idx     = 0;
 let drawing = false;
@@ -599,19 +634,20 @@ function renderGuide() {
   tmplCtx.fillText(char, W / 2, H / 2);
 
   guideCtx.clearRect(0, 0, W, H);
-  guideCtx.font         = font;
-  guideCtx.textAlign    = 'center';
-  guideCtx.textBaseline = 'middle';
 
-  guideCtx.fillStyle = 'rgba(109,40,217,0.18)';
-  guideCtx.fillText(char, W / 2, H / 2);
-
-  guideCtx.strokeStyle = 'rgba(109,40,217,0.45)';
-  guideCtx.lineWidth   = Math.max(2, fs * 0.012);
-  guideCtx.lineJoin    = 'round';
-  guideCtx.setLineDash([fs * 0.04, fs * 0.025]);
-  guideCtx.strokeText(char, W / 2, H / 2);
-  guideCtx.setLineDash([]);
+  if (submode === 'tracing') {
+    guideCtx.font         = font;
+    guideCtx.textAlign    = 'center';
+    guideCtx.textBaseline = 'middle';
+    guideCtx.fillStyle = 'rgba(109,40,217,0.18)';
+    guideCtx.fillText(char, W / 2, H / 2);
+    guideCtx.strokeStyle = 'rgba(109,40,217,0.45)';
+    guideCtx.lineWidth   = Math.max(2, fs * 0.012);
+    guideCtx.lineJoin    = 'round';
+    guideCtx.setLineDash([fs * 0.04, fs * 0.025]);
+    guideCtx.strokeText(char, W / 2, H / 2);
+    guideCtx.setLineDash([]);
+  }
 }
 
 function clamp(min, val, max) { return Math.max(min, Math.min(max, val)); }
@@ -756,7 +792,7 @@ function checkTrace() {
   if (dTotal < 150)      stars = 0;
   else if (score < 0.30) stars = 1;
   else if (score < 0.50) stars = 2;
-  else if (score < 0.65) stars = 3;
+  else if (score < 0.80) stars = 3;
   else if (score < 0.95) stars = 4;
   else                   stars = 5;
 
@@ -774,7 +810,8 @@ const RESULTS = [
 ];
 
 function showResult(stars) {
-  if (stars < 5) {
+  const minStars = submode === 'writing' ? 4 : 5;
+  if (stars < minStars) {
     playSound('error');
     shakeCanvas();
     clearDrawing();
@@ -791,7 +828,9 @@ function showResult(stars) {
   document.getElementById('r-emoji').textContent   = r.emoji;
   document.getElementById('r-msg').textContent     = r.msg;
   document.getElementById('r-msg').style.color     = r.color;
-  document.getElementById('r-sub').textContent     = r.sub;
+  document.getElementById('r-sub').textContent     = submode === 'writing'
+    ? 'You wrote it! Great job! 🎊'
+    : r.sub;
 
   const row = document.getElementById('r-stars');
   row.innerHTML = '';
@@ -913,20 +952,24 @@ function startMode(m) {
   idx   = 0;
   done.clear();
 
+  document.getElementById('mode-select-emoji').textContent = m === 'letters' ? '🔤' : '🔢';
   document.getElementById('welcome').classList.remove('active');
-  document.getElementById('tracing').classList.add('active');
+  document.getElementById('mode-select').classList.add('active');
+}
 
+function startSubMode(sub) {
+  submode = sub;
+  document.getElementById('mode-select').classList.remove('active');
+  document.getElementById('tracing').classList.add('active');
   buildDots();
   setLabel();
-
   document.fonts.ready.then(() => { resize(); });
 }
 
 function setLabel() {
-  const label = mode === 'letters'
-    ? `Trace the letter ${items[idx]}`
-    : `Trace the number ${items[idx]}`;
-  document.getElementById('char-label').textContent = label;
+  const verb = submode === 'writing' ? 'Write' : 'Trace';
+  const noun = mode === 'letters' ? 'letter' : 'number';
+  document.getElementById('char-label').textContent = `${verb} the ${noun} ${items[idx]}`;
 }
 
 function loadChar() {
@@ -944,6 +987,7 @@ function skipCurrent() {
 function goHome() {
   document.getElementById('result-overlay').classList.remove('active');
   document.getElementById('tracing').classList.remove('active');
+  document.getElementById('mode-select').classList.remove('active');
   document.getElementById('math-screen').classList.remove('active');
   document.getElementById('sight-screen').classList.remove('active');
   document.getElementById('welcome').classList.add('active');
