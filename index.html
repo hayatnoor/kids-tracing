@@ -79,7 +79,7 @@
     }
     .btn-xl {
       font-size: clamp(1.8rem, 5vw, 3rem);
-      padding: 18px 46px;
+      padding: 18px 20px;
       box-shadow: 0 9px 0 rgba(0,0,0,0.22);
     }
     .btn-lg {
@@ -341,9 +341,9 @@
 
     .choice-btn {
       font-family: 'Fredoka One', cursive;
-      font-size: clamp(2.2rem, 9vw, 4rem);
-      width: clamp(82px, 25vw, 140px);
-      height: clamp(82px, 25vw, 140px);
+      font-size: clamp(1.8rem, 7vw, 3.2rem);
+      width: clamp(68px, 19vw, 120px);
+      height: clamp(68px, 19vw, 120px);
       border-radius: 24px;
       display: flex;
       align-items: center;
@@ -384,7 +384,7 @@
       border-radius: 28px;
       box-shadow: 0 8px 32px rgba(219,39,119,0.13);
       min-height: 0;
-      max-height: 60vh;
+      max-height: 45vh;
     }
 
     .listen-btn {
@@ -1007,20 +1007,20 @@ function generateProblem() {
     op = '−';
   }
 
-  // Two wrong choices close to the correct answer
+  // Three wrong choices close to the correct answer
   const wrongs = new Set();
   let tries = 0;
-  while (wrongs.size < 2 && tries < 60) {
+  while (wrongs.size < 3 && tries < 60) {
     tries++;
     const d = Math.floor(Math.random() * 3) + 1;
     const w = answer + (Math.random() > 0.5 ? d : -d);
     if (w !== answer && w >= 0 && w <= 10) wrongs.add(w);
   }
-  for (let n = 0; n <= 10 && wrongs.size < 2; n++) {
+  for (let n = 0; n <= 10 && wrongs.size < 3; n++) {
     if (n !== answer) wrongs.add(n);
   }
 
-  const choices = [answer, ...[...wrongs].slice(0, 2)].sort(() => Math.random() - 0.5);
+  const choices = [answer, ...[...wrongs].slice(0, 3)].sort(() => Math.random() - 0.5);
   return { a, b, answer, op, choices, emoji };
 }
 
@@ -1056,7 +1056,7 @@ function renderMathProblem() {
 
   display.innerHTML = `${emojiHTML}<div class="math-equation">${a} ${op} ${b} = ?</div>`;
 
-  const btnColors = ['yellow', 'blue', 'green'];
+  const btnColors = ['yellow', 'blue', 'green', 'purple'];
   const shuffledColors = [...btnColors].sort(() => Math.random() - 0.5);
   document.getElementById('math-choices').innerHTML = choices.map((c, i) =>
     `<button class="btn choice-btn ${shuffledColors[i]}" onclick="checkMathAnswer(${c})">${c}</button>`
@@ -1206,17 +1206,38 @@ function speakWord(word) {
   if (!window.speechSynthesis || !word) return;
   window.speechSynthesis.cancel();
 
-  const utt = new SpeechSynthesisUtterance(word);
-  utt.rate   = 0.82;
-  utt.pitch  = 1.1;
-  utt.volume = 1;
-
   const btn = document.getElementById('sight-listen-btn');
-  if (btn) btn.classList.add('speaking');
-  utt.onend  = () => { if (btn) btn.classList.remove('speaking'); };
-  utt.onerror = () => { if (btn) btn.classList.remove('speaking'); };
 
-  window.speechSynthesis.speak(utt);
+  function doSpeak(voices) {
+    const utt = new SpeechSynthesisUtterance(word);
+    utt.rate   = 0.7;
+    utt.pitch  = 1.15;
+    utt.volume = 1;
+
+    const preferred = ['Samantha (Enhanced)', 'Samantha', 'Karen', 'Moira', 'Tessa', 'Fiona', 'Victoria'];
+    const pick =
+      preferred.map(n => voices.find(v => v.name === n)).find(Boolean) ||
+      voices.find(v => v.lang.startsWith('en-US') && !v.name.includes('Alex')) ||
+      voices.find(v => v.lang.startsWith('en'));
+    if (pick) utt.voice = pick;
+    console.log('Speaking with voice:', pick ? pick.name : 'default', 'Available:', voices.map(v => v.name));
+
+    if (btn) btn.classList.add('speaking');
+    utt.onend  = () => { if (btn) btn.classList.remove('speaking'); };
+    utt.onerror = () => { if (btn) btn.classList.remove('speaking'); };
+    window.speechSynthesis.speak(utt);
+  }
+
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length) {
+    doSpeak(voices);
+  } else {
+    // Voices not loaded yet — wait for them
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.onvoiceschanged = null;
+      doSpeak(window.speechSynthesis.getVoices());
+    };
+  }
 }
 
 function checkSightAnswer(word) {
