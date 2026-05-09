@@ -522,6 +522,16 @@
     <button class="btn btn-lg red"   onclick="clearDrawing()">🗑 Clear</button>
     <button class="btn btn-lg green" onclick="checkTrace()">⭐ Check!</button>
   </div>
+  <div id="score-debug" style="
+    text-align:center;
+    font-family:'Nunito',sans-serif;
+    font-size:1rem;
+    color:#7c3aed;
+    padding-bottom:10px;
+    min-height:1.4em;
+    opacity:0;
+    transition:opacity 0.3s;
+  "></div>
 </div>
 
 <!-- ═══════════════ MATH ═══════════════ -->
@@ -818,7 +828,7 @@ function checkTrace() {
   else if (score < 0.95) stars = 4;
   else                   stars = 5;
 
-  showResult(stars);
+  showResult(stars, score);
 }
 
 // ── RESULT UI ─────────────────────────────────────────────────
@@ -831,12 +841,20 @@ const RESULTS = [
   { emoji:'🏆', msg:'AMAZING!',       sub:'Perfect! You rock! 🎊',                color:'#a855f7' },
 ];
 
-function showResult(stars) {
+let _scoreDebugTimer = null;
+function showResult(stars, score) {
   const minStars = submode === 'writing' ? 4 : 5;
   if (stars < minStars) {
     playSound('error');
     shakeCanvas();
     clearDrawing();
+    const el = document.getElementById('score-debug');
+    if (el) {
+      el.textContent = `Score: ${Math.round((score ?? 0) * 100)}%`;
+      el.style.opacity = '1';
+      clearTimeout(_scoreDebugTimer);
+      _scoreDebugTimer = setTimeout(() => { el.style.opacity = '0'; }, 2500);
+    }
     return;
   }
 
