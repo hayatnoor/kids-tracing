@@ -647,6 +647,28 @@ function renderGuide() {
     guideCtx.setLineDash([fs * 0.04, fs * 0.025]);
     guideCtx.strokeText(char, W / 2, H / 2);
     guideCtx.setLineDash([]);
+  } else {
+    // Writing mode: show a dashed box matching the template character's bounds
+    guideCtx.font         = font;
+    guideCtx.textAlign    = 'center';
+    guideCtx.textBaseline = 'middle';
+    const m   = guideCtx.measureText(char);
+    const pad = fs * 0.14;
+    const boxW = m.width + pad * 2;
+    const boxH = (m.actualBoundingBoxAscent + m.actualBoundingBoxDescent) + pad * 2;
+    const boxX = W / 2 - boxW / 2;
+    const boxY = H / 2 - boxH / 2;
+    const radius = 20;
+
+    guideCtx.beginPath();
+    guideCtx.roundRect(boxX, boxY, boxW, boxH, radius);
+    guideCtx.fillStyle   = 'rgba(109,40,217,0.05)';
+    guideCtx.fill();
+    guideCtx.strokeStyle = 'rgba(109,40,217,0.4)';
+    guideCtx.lineWidth   = 3;
+    guideCtx.setLineDash([14, 9]);
+    guideCtx.stroke();
+    guideCtx.setLineDash([]);
   }
 }
 
