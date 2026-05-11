@@ -185,7 +185,7 @@ function updateSightDots() {
   for (let i = 0; i < SIGHT_TOTAL; i++) {
     const d = document.getElementById(`sd${i}`);
     if (!d) return;
-    if (i < sightDone)        d.className = 'dot done';
+    if (i < sightDone)        d.className = sightAttempts[i] === 0 ? 'dot done' : 'dot wrong';
     else if (i === sightDone) d.className = 'dot current';
     else                      d.className = 'dot';
   }

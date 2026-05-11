@@ -84,9 +84,12 @@ function renderMathProblem() {
         <div class="math-emoji-row">${makeRow(b)}</div>
       </div>`;
   } else {
+    const subRow = Array(a).fill(0).map((_, i) =>
+      `<span class="${i >= a - b ? 'math-emoji-faded' : ''}">${emoji}</span>`
+    ).join('');
     emojiHTML = `
       <div class="math-emoji-group">
-        <div class="math-emoji-row">${makeRow(a)}</div>
+        <div class="math-emoji-row">${subRow}</div>
         <div class="math-op-label">take away ${b}</div>
       </div>`;
   }
@@ -172,8 +175,8 @@ function updateMathDots() {
   for (let i = 0; i < MATH_TOTAL; i++) {
     const d = document.getElementById(`md${i}`);
     if (!d) return;
-    if (i < mathCorrect)      d.className = 'dot done';
+    if (i < mathCorrect)        d.className = mathAttempts[i] === 0 ? 'dot done' : 'dot wrong';
     else if (i === mathCorrect) d.className = 'dot current';
-    else                       d.className = 'dot';
+    else                        d.className = 'dot';
   }
 }

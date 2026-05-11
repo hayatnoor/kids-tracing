@@ -202,7 +202,7 @@ function updateArabicDots() {
   for (let i = 0; i < ARABIC_TOTAL; i++) {
     const d = document.getElementById(`ad${i}`);
     if (!d) return;
-    if (i < arabicDone)        d.className = 'dot done';
+    if (i < arabicDone)        d.className = arabicAttempts[i] === 0 ? 'dot done' : 'dot wrong';
     else if (i === arabicDone) d.className = 'dot current';
     else                       d.className = 'dot';
   }

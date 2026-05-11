@@ -188,6 +188,7 @@
       flex-shrink: 0;
     }
     .dot.done    { background: #4ade80; }
+    .dot.wrong   { background: #f87171; }
     .dot.current { background: #818cf8; }
 
     /* Bottom bar */
@@ -343,6 +344,17 @@
       font-weight: 700;
       font-size: clamp(1rem, 3.5vw, 1.4rem);
       color: #6b7280;
+    }
+
+    @keyframes emoji-fade-out {
+      0%   { opacity: 1;   filter: grayscale(0%); }
+      100% { opacity: 0.2; filter: grayscale(100%); }
+    }
+
+    .math-emoji-faded {
+      opacity: 0.2;
+      filter: grayscale(100%);
+      animation: emoji-fade-out 2.5s ease-out forwards;
     }
 
     .math-equation {
