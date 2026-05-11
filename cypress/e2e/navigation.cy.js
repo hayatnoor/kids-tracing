@@ -8,12 +8,13 @@ describe('Navigation', () => {
     cy.contains("Let's Learn!").should('be.visible');
   });
 
-  it('displays all five mode buttons', () => {
+  it('displays all six mode buttons', () => {
     cy.contains('🔤 Letters').should('be.visible');
     cy.contains('🔢 Numbers').should('be.visible');
     cy.contains('🧮 Math').should('be.visible');
     cy.contains('📖 Sight Words').should('be.visible');
     cy.contains('🌙 Arabic').should('be.visible');
+    cy.contains('🔷 Shapes').should('be.visible');
   });
 
   // ── Letters ──────────────────────────────────────────────────
@@ -111,5 +112,20 @@ describe('Navigation', () => {
     cy.get('#arabic-screen').find('.btn-icon').click();
     cy.get('#welcome').should('have.class', 'active');
     cy.get('#arabic-screen').should('not.have.class', 'active');
+  });
+
+  // ── Shapes ────────────────────────────────────────────────────
+
+  it('Shapes goes directly to the shapes screen', () => {
+    cy.contains('🔷 Shapes').click();
+    cy.get('#shapes-screen').should('have.class', 'active');
+    cy.get('#welcome').should('not.have.class', 'active');
+  });
+
+  it('shapes Home button returns to welcome', () => {
+    cy.contains('🔷 Shapes').click();
+    cy.get('#shapes-screen').find('.btn-icon').click();
+    cy.get('#welcome').should('have.class', 'active');
+    cy.get('#shapes-screen').should('not.have.class', 'active');
   });
 });

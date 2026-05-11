@@ -90,6 +90,18 @@ describe('Sight Words Mode', () => {
     });
   });
 
+  it('wrong-then-correct marks the dot red (dot.wrong), not green', () => {
+    getCurrentWord().then(word => {
+      cy.get('.sight-card').then($cards => {
+        const wrong = [...$cards].find(c => c.textContent.trim() !== word);
+        cy.wrap(wrong).click();
+        cy.contains('.sight-card', word).click();
+        cy.get('#sight-progress-row .dot.wrong').should('have.length', 1);
+        cy.get('#sight-progress-row .dot.done').should('not.exist');
+      });
+    });
+  });
+
   // ── Listen button ─────────────────────────────────────────────
 
   it('Listen button is clickable without error', () => {

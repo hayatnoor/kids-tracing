@@ -89,6 +89,18 @@ describe('Arabic Letters Mode', () => {
     });
   });
 
+  it('wrong-then-correct marks the dot red (dot.wrong), not green', () => {
+    getCurrentChar().then(char => {
+      cy.get('.arabic-card').then($cards => {
+        const wrong = [...$cards].find(c => c.dataset.char !== char);
+        cy.wrap(wrong).click();
+        cy.get(`.arabic-card[data-char="${char}"]`).click();
+        cy.get('#arabic-progress-row .dot.wrong').should('have.length', 1);
+        cy.get('#arabic-progress-row .dot.done').should('not.exist');
+      });
+    });
+  });
+
   // ── Listen button ─────────────────────────────────────────────
 
   it('Listen button is clickable without error', () => {

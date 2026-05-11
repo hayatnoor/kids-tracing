@@ -84,6 +84,19 @@ describe('Math Mode', () => {
     });
   });
 
+  it('wrong-then-correct marks the dot red (dot.wrong), not green', () => {
+    cy.get('.math-equation').invoke('text').then(text => {
+      const answer = answerFromEquation(text);
+      cy.get('#math-choices .choice-btn').then($btns => {
+        const wrong = [...$btns].find(b => Number(b.textContent.trim()) !== answer);
+        cy.wrap(wrong).click();
+        cy.contains('#math-choices .choice-btn', String(answer)).click();
+        cy.get('#math-progress-row .dot.wrong').should('have.length', 1);
+        cy.get('#math-progress-row .dot.done').should('not.exist');
+      });
+    });
+  });
+
   // ── Game complete overlay ────────────────────────────────────
 
   it('result overlay shows the trophy emoji and Math Star heading', () => {
