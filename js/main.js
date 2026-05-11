@@ -2,7 +2,7 @@
 
 function tryAgain() {
   document.getElementById('result-overlay').classList.remove('active');
-  if (mode === 'math' || mode === 'sight' || mode === 'arabic') {
+  if (mode === 'math' || mode === 'sight' || mode === 'arabic' || mode === 'shapes') {
     goHome();
   } else {
     clearDrawing();
@@ -17,6 +17,8 @@ function nextChar() {
     startSight();
   } else if (mode === 'arabic') {
     startArabic();
+  } else if (mode === 'shapes') {
+    startShapes();
   } else {
     idx = (idx + 1) % items.length;
     loadChar();
@@ -69,6 +71,7 @@ function goHome() {
   document.getElementById('math-screen').classList.remove('active');
   document.getElementById('sight-screen').classList.remove('active');
   document.getElementById('arabic-screen').classList.remove('active');
+  document.getElementById('shapes-screen').classList.remove('active');
   document.getElementById('welcome').classList.add('active');
   if (window.speechSynthesis) window.speechSynthesis.cancel();
 }

@@ -19,6 +19,7 @@
     <button class="btn btn-xl" style="background:#fb923c;color:#7c2d12;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="startMath()">🧮 Math</button>
     <button class="btn btn-xl" style="background:#ec4899;color:white;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="startSight()">📖 Sight Words</button>
     <button class="btn btn-xl" style="background:#0d9488;color:white;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="startArabic()">🌙 Arabic</button>
+    <button class="btn btn-xl" style="background:#6366f1;color:white;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="startShapes()">🔷 Shapes</button>
   </div>
 </div>
 
@@ -113,6 +114,23 @@
   <div class="progress-row" id="arabic-progress-row"></div>
 </div>
 
+<!-- ═══════════════ SHAPES ═══════════════ -->
+<div id="shapes-screen" class="screen">
+  <div class="top-bar">
+    <button class="btn btn-icon white" onclick="goHome()" title="Home">🏠</button>
+    <div class="char-label" id="shapes-label">Shape 1 of 10</div>
+    <div style="width:52px;flex-shrink:0"></div>
+  </div>
+
+  <div class="shapes-content-wrap" id="shapes-content-wrap"></div>
+
+  <div class="shapes-question" id="shapes-question"></div>
+
+  <div id="shapes-grid"></div>
+
+  <div class="progress-row" id="shapes-progress-row"></div>
+</div>
+
 <!-- ═══════════════ RESULT OVERLAY ═══════════════ -->
 <div id="result-overlay">
   <div class="result-card">
@@ -132,6 +150,7 @@
 <script src="js/math.js"></script>
 <script src="js/sight.js"></script>
 <script src="js/arabic.js"></script>
+<script src="js/shapes.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>
