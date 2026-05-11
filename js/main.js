@@ -1,7 +1,5 @@
 'use strict';
 
-'use strict';
-
 function tryAgain() {
   document.getElementById('result-overlay').classList.remove('active');
   if (mode === 'math' || mode === 'sight' || mode === 'arabic') {
@@ -20,7 +18,7 @@ function nextChar() {
   } else if (mode === 'arabic') {
     startArabic();
   } else {
-    idx = (idx + 1)  0tems.length;
+    idx = (idx + 1) % items.length;
     loadChar();
   }
 }
@@ -60,7 +58,7 @@ function loadChar() {
 }
 
 function skipCurrent() {
-  idx = (idx + 1)  0tems.length;
+  idx = (idx + 1) % items.length;
   loadChar();
 }
 

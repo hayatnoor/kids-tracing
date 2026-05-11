@@ -1,7 +1,5 @@
 'use strict';
 
-'use strict';
-
 // ── SOUND ─────────────────────────────────────────────────────
 let actx;
 function getACtx() {
@@ -68,4 +66,11 @@ function launchConfetti() {
         width: ${size}px;
         height: ${size}px;
         background: ${palette[Math.floor(Math.random() * palette.length)]};
-        border-radius: ${Math.random() > 0.5 ? '50
+        border-radius: ${Math.random() > 0.5 ? '50%' : '4px'};
+        animation-duration: ${1.5 + Math.random()}s;
+      `;
+      document.body.appendChild(el);
+      el.addEventListener('animationend', () => el.remove());
+    }, i * 20);
+  }
+}
