@@ -4,7 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start":   "serve -l 3000 .",
+    "cy:open": "cypress open",
+    "cy:run":  "cypress run",
+    "test":    "start-server-and-test start http://localhost:3000 cy:run"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "cypress": "^15.14.2",
+    "serve": "^14.2.6",
+    "start-server-and-test": "^3.0.4"
+  }
 }
