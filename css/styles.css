@@ -702,3 +702,110 @@
       width: clamp(60px, 16vw, 88px);
       height: clamp(60px, 16vw, 88px);
     }
+
+    /* ── MATCHING SIZE SELECT ── */
+    #matching-size-screen {
+      height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      background: linear-gradient(160deg, #fef3c7 0%, #fde68a 100%);
+    }
+
+    /* ── MATCHING SCREEN ── */
+    #matching-screen {
+      height: 100vh;
+      flex-direction: column;
+      background: linear-gradient(160deg, #fef3c7 0%, #fde68a 100%);
+    }
+
+    #matching-screen .char-label { color: #92400e; }
+
+    .matching-stats {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .matching-stat {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: clamp(0.75rem, 2.5vw, 1rem);
+      color: #92400e;
+      white-space: nowrap;
+    }
+
+    .matching-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(8px, 2vw, 14px);
+      padding: clamp(10px, 2.5vw, 16px);
+      align-content: center;
+      min-height: 0;
+    }
+
+    .matching-tile {
+      aspect-ratio: 1;
+      perspective: 600px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .matching-tile-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .matching-tile.flipped .matching-tile-inner,
+    .matching-tile.matched .matching-tile-inner {
+      transform: rotateY(180deg);
+    }
+
+    .matching-tile-front,
+    .matching-tile-back {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      font-size: clamp(1.6rem, 6vw, 2.8rem);
+      box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+      transition: box-shadow 80ms;
+    }
+
+    .matching-tile-front {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(1.4rem, 5vw, 2.2rem);
+      letter-spacing: 0.05em;
+    }
+
+    .matching-tile-back {
+      background: white;
+      transform: rotateY(180deg);
+    }
+
+    .matching-tile.matched .matching-tile-back {
+      background: #dcfce7;
+      box-shadow: 0 4px 0 rgba(74,222,128,0.5);
+    }
+
+    .matching-tile:active .matching-tile-inner {
+      transform: scale(0.93);
+    }
+    .matching-tile.flipped:active .matching-tile-inner,
+    .matching-tile.matched:active .matching-tile-inner {
+      transform: rotateY(180deg) scale(0.93);
+    }

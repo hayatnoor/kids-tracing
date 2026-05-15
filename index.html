@@ -20,6 +20,7 @@
     <button class="btn btn-xl" style="background:#ec4899;color:white;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="startSight()">📖 Sight Words</button>
     <button class="btn btn-xl" style="background:#0d9488;color:white;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="startArabic()">🌙 Arabic</button>
     <button class="btn btn-xl" style="background:#6366f1;color:white;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="startShapes()">🔷 Shapes</button>
+    <button class="btn btn-xl" style="background:#f59e0b;color:#78350f;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="startMatching()">🚗 Matching</button>
   </div>
 </div>
 
@@ -131,6 +132,32 @@
   <div class="progress-row" id="shapes-progress-row"></div>
 </div>
 
+<!-- ═══════════════ MATCHING SIZE SELECT ═══════════════ -->
+<div id="matching-size-screen" class="screen">
+  <div class="mode-select-emoji">🚗</div>
+  <div class="mode-select-title">How many tiles?</div>
+  <div class="choice-row">
+    <button class="btn btn-xl yellow"                                                                          onclick="startMatchingWithSize(8)">8</button>
+    <button class="btn btn-xl green"                                                                           onclick="startMatchingWithSize(12)">12</button>
+    <button class="btn btn-xl" style="background:#fb923c;color:#7c2d12;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="startMatchingWithSize(16)">16</button>
+    <button class="btn btn-xl" style="background:#a78bfa;color:white;box-shadow:0 9px 0 rgba(0,0,0,0.22);"   onclick="startMatchingWithSize(20)">20</button>
+  </div>
+  <button class="btn btn-lg white" onclick="goHome()" style="box-shadow:0 5px 0 rgba(0,0,0,0.12);">← Back</button>
+</div>
+
+<!-- ═══════════════ MATCHING ═══════════════ -->
+<div id="matching-screen" class="screen">
+  <div class="top-bar">
+    <button class="btn btn-icon white" onclick="goHome()" title="Home">🏠</button>
+    <div class="char-label" id="matching-label">🚗 Car Match!</div>
+    <div class="matching-stats">
+      <div id="matching-pairs" class="matching-stat">0/6 pairs</div>
+      <div id="matching-moves" class="matching-stat">Moves: 0</div>
+    </div>
+  </div>
+  <div id="matching-grid" class="matching-grid"></div>
+</div>
+
 <!-- ═══════════════ RESULT OVERLAY ═══════════════ -->
 <div id="result-overlay">
   <div class="result-card">
@@ -151,6 +178,7 @@
 <script src="js/sight.js"></script>
 <script src="js/arabic.js"></script>
 <script src="js/shapes.js"></script>
+<script src="js/matching.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

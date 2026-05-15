@@ -2,7 +2,7 @@
 
 function tryAgain() {
   document.getElementById('result-overlay').classList.remove('active');
-  if (mode === 'math' || mode === 'sight' || mode === 'arabic' || mode === 'shapes') {
+  if (mode === 'math' || mode === 'sight' || mode === 'arabic' || mode === 'shapes' || mode === 'matching') {
     goHome();
   } else {
     clearDrawing();
@@ -19,6 +19,10 @@ function nextChar() {
     startArabic();
   } else if (mode === 'shapes') {
     startShapes();
+  } else if (mode === 'matching') {
+    document.getElementById('result-overlay').classList.remove('active');
+    document.getElementById('matching-screen').classList.remove('active');
+    document.getElementById('matching-size-screen').classList.add('active');
   } else {
     idx = (idx + 1) % items.length;
     loadChar();
@@ -72,6 +76,8 @@ function goHome() {
   document.getElementById('sight-screen').classList.remove('active');
   document.getElementById('arabic-screen').classList.remove('active');
   document.getElementById('shapes-screen').classList.remove('active');
+  document.getElementById('matching-size-screen').classList.remove('active');
+  document.getElementById('matching-screen').classList.remove('active');
   document.getElementById('welcome').classList.add('active');
   if (window.speechSynthesis) window.speechSynthesis.cancel();
 }
