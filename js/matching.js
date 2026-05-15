@@ -50,9 +50,12 @@ function buildMatchingGrid() {
   }
   matchingTiles = pairs.map((car, i) => ({ ...car, idx: i, matched: false, flipped: false }));
 
-  const cols = matchingPairs <= 4 ? 4 : matchingPairs <= 8 ? 4 : 5;
+  const wide = window.innerWidth >= 900;
+  const cols = wide
+    ? (matchingPairs <= 4 ? 4 : matchingPairs <= 6 ? 6 : matchingPairs <= 8 ? 8 : 10)
+    : (matchingPairs <= 8 ? 4 : 5);
   const grid = document.getElementById('matching-grid');
-  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  grid.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 90px))`;
   grid.innerHTML = matchingTiles.map((tile, i) => `
     <div class="matching-tile" id="mt${i}" onclick="flipTile(${i})">
       <div class="matching-tile-inner">

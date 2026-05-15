@@ -742,9 +742,10 @@
       flex: 1;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: clamp(8px, 2vw, 14px);
-      padding: clamp(10px, 2.5vw, 16px);
+      gap: clamp(8px, 2vw, 12px);
+      padding: clamp(10px, 2.5vw, 14px);
       align-content: center;
+      justify-content: center;
       min-height: 0;
     }
 
