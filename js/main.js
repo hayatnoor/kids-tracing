@@ -12,7 +12,7 @@ function tryAgain() {
 function nextChar() {
   document.getElementById('result-overlay').classList.remove('active');
   if (mode === 'math') {
-    startMath();
+    if (mathGrade === '1st') { startMath1st(); } else { startMath(); }
   } else if (mode === 'sight') {
     startSight();
   } else if (mode === 'arabic') {
@@ -68,6 +68,27 @@ function skipCurrent() {
   loadChar();
 }
 
+let currentGrade = 'kg';
+
+function selectGrade(grade) {
+  currentGrade = grade;
+  document.getElementById('grade-select').classList.remove('active');
+  if (grade === 'kg') {
+    document.getElementById('welcome').classList.add('active');
+  } else if (grade === '1st') {
+    document.getElementById('grade-1-screen').classList.add('active');
+  } else {
+    document.getElementById('grade-2-screen').classList.add('active');
+  }
+}
+
+function goGradePicker() {
+  document.getElementById('welcome').classList.remove('active');
+  document.getElementById('grade-1-screen').classList.remove('active');
+  document.getElementById('grade-2-screen').classList.remove('active');
+  document.getElementById('grade-select').classList.add('active');
+}
+
 function goHome() {
   document.getElementById('result-overlay').classList.remove('active');
   document.getElementById('tracing').classList.remove('active');
@@ -78,7 +99,11 @@ function goHome() {
   document.getElementById('shapes-screen').classList.remove('active');
   document.getElementById('matching-size-screen').classList.remove('active');
   document.getElementById('matching-screen').classList.remove('active');
-  document.getElementById('welcome').classList.add('active');
+  if (currentGrade === '1st') {
+    document.getElementById('grade-1-screen').classList.add('active');
+  } else {
+    document.getElementById('welcome').classList.add('active');
+  }
   if (window.speechSynthesis) window.speechSynthesis.cancel();
 }
 

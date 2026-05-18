@@ -11,8 +11,10 @@ let mathQuestion        = 0;
 let currentProblem      = null;
 let mathAttempts        = [];
 let mathCurrentAttempts = 0;
+let mathGrade           = 'kg';
 
 function startMath() {
+  mathGrade    = 'kg';
   mode         = 'math';
   mathCorrect         = 0;
   mathQuestion        = 0;
@@ -26,7 +28,24 @@ function startMath() {
   nextMathProblem();
 }
 
+function startMath1st() {
+  mathGrade    = '1st';
+  mode         = 'math';
+  mathCorrect         = 0;
+  mathQuestion        = 0;
+  mathAttempts        = [];
+  mathCurrentAttempts = 0;
+
+  document.getElementById('grade-1-screen').classList.remove('active');
+  document.getElementById('math-screen').classList.add('active');
+
+  buildMathDots();
+  nextMathProblem();
+}
+
 function generateProblem() {
+  if (mathGrade === '1st') return generateProblem1st();
+
   const emoji = MATH_EMOJI[Math.floor(Math.random() * MATH_EMOJI.length)];
   const isAdd = Math.random() > 0.35;
 
@@ -54,6 +73,41 @@ function generateProblem() {
     if (w !== answer && w >= 0 && w <= 10) wrongs.add(w);
   }
   for (let n = 0; n <= 10 && wrongs.size < 3; n++) {
+    if (n !== answer) wrongs.add(n);
+  }
+
+  const choices = [answer, ...[...wrongs].slice(0, 3)].sort(() => Math.random() - 0.5);
+  return { a, b, answer, op, choices, emoji };
+}
+
+function generateProblem1st() {
+  const emoji  = MATH_EMOJI[Math.floor(Math.random() * MATH_EMOJI.length)];
+  const isAdd  = Math.random() > 0.35;
+
+  let a, b, answer, op;
+  if (isAdd) {
+    // answer in 10–19, both operands at least 1
+    answer = Math.floor(Math.random() * 10) + 10; // 10–19
+    a = Math.floor(Math.random() * Math.min(9, answer - 1)) + 1;
+    b = answer - a;
+    op = '+';
+  } else {
+    // a in 11–19, b in 1–9
+    a = Math.floor(Math.random() * 9) + 11; // 11–19
+    b = Math.floor(Math.random() * Math.min(9, a - 1)) + 1;
+    answer = a - b;
+    op = '−';
+  }
+
+  const wrongs = new Set();
+  let tries = 0;
+  while (wrongs.size < 3 && tries < 60) {
+    tries++;
+    const d = Math.floor(Math.random() * 3) + 1;
+    const w = answer + (Math.random() > 0.5 ? d : -d);
+    if (w !== answer && w >= 0 && w <= 19) wrongs.add(w);
+  }
+  for (let n = 0; n <= 19 && wrongs.size < 3; n++) {
     if (n !== answer) wrongs.add(n);
   }
 

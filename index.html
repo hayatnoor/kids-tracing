@@ -6,11 +6,23 @@
   <title>Tiny Thinkers</title>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" type="image/png" href="img/tiny-thinkers.png">
 </head>
 <body>
 
+<!-- ═══════════════ GRADE SELECT ═══════════════ -->
+<div id="grade-select" class="screen active">
+  <img src="img/tiny-thinkers.png" alt="Tiny Thinkers" class="logo">
+  <div class="welcome-sub">Which grade are you in? 🎒</div>
+  <div class="choice-row">
+    <button class="btn btn-xl yellow" onclick="selectGrade('kg')">KG</button>
+    <button class="btn btn-xl green"  onclick="selectGrade('1st')">1st</button>
+    <button class="btn btn-xl" style="background:#a78bfa;color:white;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="selectGrade('2nd')">2nd</button>
+  </div>
+</div>
+
 <!-- ═══════════════ WELCOME ═══════════════ -->
-<div id="welcome" class="screen active">
+<div id="welcome" class="screen">
   <div class="welcome-title">Tiny Thinkers</div>
   <div class="welcome-sub">Choose what to practice 👇</div>
   <div class="choice-row">
@@ -22,6 +34,27 @@
     <button class="btn btn-xl" style="background:#6366f1;color:white;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="startShapes()">🔷 Shapes</button>
     <button class="btn btn-xl" style="background:#f59e0b;color:#78350f;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="startMatching()">🚗 Matching</button>
   </div>
+  <button class="btn btn-lg white" onclick="goGradePicker()" style="box-shadow:0 5px 0 rgba(0,0,0,0.12);">← Change Grade</button>
+</div>
+
+<!-- ═══════════════ 1ST GRADE ═══════════════ -->
+<div id="grade-1-screen" class="screen">
+  <div class="welcome-title">1st Grade</div>
+  <div class="welcome-sub">Choose what to practice 👇</div>
+  <div class="choice-row">
+    <button class="btn btn-xl" style="background:#fb923c;color:#7c2d12;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="startMath1st()">🧮 Math</button>
+  </div>
+  <div class="welcome-sub" style="font-size:clamp(0.9rem,3vw,1.4rem);opacity:0.8;">More subjects coming soon!</div>
+  <button class="btn btn-lg white" onclick="goGradePicker()" style="box-shadow:0 5px 0 rgba(0,0,0,0.12);">← Change Grade</button>
+</div>
+
+<!-- ═══════════════ 2ND GRADE (COMING SOON) ═══════════════ -->
+<div id="grade-2-screen" class="screen">
+  <div class="welcome-title">Tiny Thinkers</div>
+  <div class="coming-soon-emoji">🚧</div>
+  <div class="coming-soon-text">Coming Soon!</div>
+  <div class="welcome-sub" style="color:rgba(255,255,255,0.85);">More activities for this grade<br>are on the way!</div>
+  <button class="btn btn-lg white" onclick="goGradePicker()" style="box-shadow:0 5px 0 rgba(0,0,0,0.12);margin-top:8px;">← Back</button>
 </div>
 
 <!-- ═══════════════ MODE SELECT ═══════════════ -->
