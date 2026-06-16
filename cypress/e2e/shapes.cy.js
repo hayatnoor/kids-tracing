@@ -18,6 +18,7 @@ function forceQType(type) {
 describe('Shapes Mode', () => {
   beforeEach(() => {
     cy.visitApp('/');
+    cy.selectGrade('KG');
     cy.contains('🔷 Shapes').click();
   });
 

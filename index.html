@@ -18,6 +18,9 @@
     <button class="btn btn-xl yellow" onclick="selectGrade('kg')">KG</button>
     <button class="btn btn-xl green"  onclick="selectGrade('1st')">1st</button>
     <button class="btn btn-xl" style="background:#a78bfa;color:white;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="selectGrade('2nd')">2nd</button>
+    <button class="btn btn-xl" style="background:#34d399;color:#064e3b;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="selectGrade('3rd')">3rd</button>
+    <button class="btn btn-xl" style="background:#fb7185;color:white;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="selectGrade('4th')">4th</button>
+    <button class="btn btn-xl" style="background:#38bdf8;color:#0c4a6e;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="selectGrade('5th')">5th</button>
   </div>
 </div>
 
@@ -37,24 +40,80 @@
   <button class="btn btn-lg white" onclick="goGradePicker()" style="box-shadow:0 5px 0 rgba(0,0,0,0.12);">← Change Grade</button>
 </div>
 
-<!-- ═══════════════ 1ST GRADE ═══════════════ -->
+<!-- ═══════════════ 1ST-5TH GRADE HOME SCREENS ═══════════════ -->
+<!-- Each shows Math + Reading category buttons leading to the shared
+     #topic-select-screen — KG keeps its own untouched flat #welcome menu. -->
 <div id="grade-1-screen" class="screen">
   <div class="welcome-title">1st Grade</div>
-  <div class="welcome-sub">Choose what to practice 👇</div>
+  <div class="welcome-sub">Choose a subject 👇</div>
   <div class="choice-row">
-    <button class="btn btn-xl" style="background:#fb923c;color:#7c2d12;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="startMath1st()">🧮 Math</button>
+    <button class="btn btn-xl" style="background:#fb923c;color:#7c2d12;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="showTopicSelect('math')">🧮 Math</button>
+    <button class="btn btn-xl" style="background:#ec4899;color:white;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="showTopicSelect('reading')">📖 Reading</button>
   </div>
-  <div class="welcome-sub" style="font-size:clamp(0.9rem,3vw,1.4rem);opacity:0.8;">More subjects coming soon!</div>
   <button class="btn btn-lg white" onclick="goGradePicker()" style="box-shadow:0 5px 0 rgba(0,0,0,0.12);">← Change Grade</button>
 </div>
 
-<!-- ═══════════════ 2ND GRADE (COMING SOON) ═══════════════ -->
 <div id="grade-2-screen" class="screen">
-  <div class="welcome-title">Tiny Thinkers</div>
-  <div class="coming-soon-emoji">🚧</div>
-  <div class="coming-soon-text">Coming Soon!</div>
-  <div class="welcome-sub" style="color:rgba(255,255,255,0.85);">More activities for this grade<br>are on the way!</div>
-  <button class="btn btn-lg white" onclick="goGradePicker()" style="box-shadow:0 5px 0 rgba(0,0,0,0.12);margin-top:8px;">← Back</button>
+  <div class="welcome-title">2nd Grade</div>
+  <div class="welcome-sub">Choose a subject 👇</div>
+  <div class="choice-row">
+    <button class="btn btn-xl" style="background:#fb923c;color:#7c2d12;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="showTopicSelect('math')">🧮 Math</button>
+    <button class="btn btn-xl" style="background:#ec4899;color:white;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="showTopicSelect('reading')">📖 Reading</button>
+  </div>
+  <button class="btn btn-lg white" onclick="goGradePicker()" style="box-shadow:0 5px 0 rgba(0,0,0,0.12);">← Change Grade</button>
+</div>
+
+<div id="grade-3-screen" class="screen">
+  <div class="welcome-title">3rd Grade</div>
+  <div class="welcome-sub">Choose a subject 👇</div>
+  <div class="choice-row">
+    <button class="btn btn-xl" style="background:#fb923c;color:#7c2d12;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="showTopicSelect('math')">🧮 Math</button>
+    <button class="btn btn-xl" style="background:#ec4899;color:white;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="showTopicSelect('reading')">📖 Reading</button>
+  </div>
+  <button class="btn btn-lg white" onclick="goGradePicker()" style="box-shadow:0 5px 0 rgba(0,0,0,0.12);">← Change Grade</button>
+</div>
+
+<div id="grade-4-screen" class="screen">
+  <div class="welcome-title">4th Grade</div>
+  <div class="welcome-sub">Choose a subject 👇</div>
+  <div class="choice-row">
+    <button class="btn btn-xl" style="background:#fb923c;color:#7c2d12;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="showTopicSelect('math')">🧮 Math</button>
+    <button class="btn btn-xl" style="background:#ec4899;color:white;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="showTopicSelect('reading')">📖 Reading</button>
+  </div>
+  <button class="btn btn-lg white" onclick="goGradePicker()" style="box-shadow:0 5px 0 rgba(0,0,0,0.12);">← Change Grade</button>
+</div>
+
+<div id="grade-5-screen" class="screen">
+  <div class="welcome-title">5th Grade</div>
+  <div class="welcome-sub">Choose a subject 👇</div>
+  <div class="choice-row">
+    <button class="btn btn-xl" style="background:#fb923c;color:#7c2d12;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="showTopicSelect('math')">🧮 Math</button>
+    <button class="btn btn-xl" style="background:#ec4899;color:white;box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="showTopicSelect('reading')">📖 Reading</button>
+  </div>
+  <button class="btn btn-lg white" onclick="goGradePicker()" style="box-shadow:0 5px 0 rgba(0,0,0,0.12);">← Change Grade</button>
+</div>
+
+<!-- ═══════════════ TOPIC SELECT (generic, 1st-5th) ═══════════════ -->
+<div id="topic-select-screen" class="screen">
+  <div class="mode-select-emoji" id="topic-select-emoji">🧮</div>
+  <div class="mode-select-title" id="topic-select-title">Choose a topic</div>
+  <div class="choice-row topic-grid" id="topic-grid"></div>
+  <button class="btn btn-lg white" onclick="goHome()" style="box-shadow:0 5px 0 rgba(0,0,0,0.12);">← Back</button>
+</div>
+
+<!-- ═══════════════ QUIZ SCREEN (generic, all new topics) ═══════════════ -->
+<div id="quiz-screen" class="screen">
+  <div class="top-bar">
+    <button class="btn btn-icon white" onclick="goHome()" title="Home">🏠</button>
+    <div class="char-label" id="quiz-label">Question 1 of 10</div>
+    <div style="width:52px;flex-shrink:0"></div>
+  </div>
+
+  <div class="math-display" id="quiz-display"></div>
+
+  <div id="quiz-choices"></div>
+
+  <div class="progress-row" id="quiz-progress-row"></div>
 </div>
 
 <!-- ═══════════════ MODE SELECT ═══════════════ -->
@@ -206,6 +265,11 @@
 </div>
 
 <script src="js/sound.js"></script>
+<script src="js/quiz-engine.js"></script>
+<script src="js/content/math-topics.js"></script>
+<script src="js/content/reading-topics.js"></script>
+<script src="js/topics/math-generators.js"></script>
+<script src="js/topics/reading-generators.js"></script>
 <script src="js/tracing.js"></script>
 <script src="js/math.js"></script>
 <script src="js/sight.js"></script>

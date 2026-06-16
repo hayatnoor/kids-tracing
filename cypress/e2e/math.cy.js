@@ -8,6 +8,7 @@ function answerFromEquation(text) {
 describe('Math Mode', () => {
   beforeEach(() => {
     cy.visitApp('/');
+    cy.selectGrade('KG');
     cy.contains('🧮 Math').click();
   });
 

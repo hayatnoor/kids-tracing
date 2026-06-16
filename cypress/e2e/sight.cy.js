@@ -8,6 +8,7 @@ function getCurrentWord() {
 describe('Sight Words Mode', () => {
   beforeEach(() => {
     cy.visitApp('/');
+    cy.selectGrade('KG');
     cy.contains('📖 Sight Words').click();
   });
 

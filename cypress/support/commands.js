@@ -48,3 +48,10 @@ Cypress.Commands.add('mathAnswer', { prevSubject: false }, (equationText) => {
   const answer  = equationText.includes('+') ? nums[0] + nums[1] : nums[0] - nums[1];
   return cy.wrap(answer);
 });
+
+// The app always lands on the grade picker first — every test that
+// exercises a grade's content needs to pick a grade before anything
+// else on screen is visible.
+Cypress.Commands.add('selectGrade', (grade) => {
+  cy.get('#grade-select').contains(grade).click();
+});

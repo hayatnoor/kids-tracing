@@ -17,6 +17,7 @@ describe('Tracing / Drawing Mode', () => {
   // Navigate to the tracing screen before each test.
   beforeEach(() => {
     cy.visitApp('/');
+    cy.selectGrade('KG');
     cy.contains('🔤 Letters').click();
     cy.contains('✏️ Trace it').click();
     // Wait for fonts + resize so the canvas has non-zero dimensions.
@@ -122,6 +123,7 @@ describe('Tracing / Drawing Mode', () => {
 
   it('Write it mode shows a Write label instead of Trace', () => {
     cy.visitApp('/');
+    cy.selectGrade('KG');
     cy.contains('🔤 Letters').click();
     cy.contains('🖊️ Write it').click();
     cy.get('#char-label').should('contain.text', 'Write the letter A');
@@ -129,6 +131,7 @@ describe('Tracing / Drawing Mode', () => {
 
   it('Write it mode result overlay also closes on Try Again', () => {
     cy.visitApp('/');
+    cy.selectGrade('KG');
     cy.contains('🔤 Letters').click();
     cy.contains('🖊️ Write it').click();
     cy.window().then(win => { win.showResult(5, 1.0); });

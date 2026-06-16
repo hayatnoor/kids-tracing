@@ -28,29 +28,16 @@
 
     /* ── GRADE SCREENS ── */
     #grade-1-screen,
-    #grade-2-screen {
+    #grade-2-screen,
+    #grade-3-screen,
+    #grade-4-screen,
+    #grade-5-screen {
       height: 100vh;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: clamp(14px, 3vh, 28px);
       background: linear-gradient(160deg, #7dd3fc 0%, #2563eb 100%);
-    }
-
-    /* ── COMING SOON ── */
-    #grade-2-screen {
-      gap: clamp(12px, 2.5vh, 24px);
-    }
-
-    .coming-soon-emoji {
-      font-size: clamp(4rem, 15vw, 7rem);
-      animation: float 2.2s ease-in-out infinite alternate;
-    }
-
-    .coming-soon-text {
-      font-size: clamp(2rem, 8vw, 4rem);
-      color: white;
-      text-shadow: 0 5px 0 rgba(0,0,0,0.15);
     }
 
     /* ── WELCOME ── */
@@ -168,6 +155,58 @@
       font-size: clamp(1.3rem, 4.5vw, 2.2rem);
       color: rgba(255,255,255,0.92);
       text-align: center;
+    }
+
+    /* ── TOPIC SELECT (generic, 1st-5th) ── */
+    #topic-select-screen {
+      height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(14px, 3vh, 28px);
+      background: linear-gradient(160deg, #6ee7f7 0%, #2563eb 100%);
+      padding: 16px;
+    }
+
+    .topic-grid {
+      max-width: 640px;
+    }
+
+    .topic-grid .btn-xl {
+      font-size: clamp(1rem, 3.2vw, 1.6rem);
+      padding: 14px 18px;
+    }
+
+    /* ── QUIZ SCREEN (generic, all new topics) ── */
+    #quiz-screen {
+      height: 100vh;
+      flex-direction: column;
+      background: linear-gradient(160deg, #e0e7ff 0%, #c7d2fe 100%);
+    }
+
+    #quiz-screen .char-label { color: #3730a3; }
+
+    /* Money topic coin chips */
+    .money-coin-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .money-coin {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(1rem, 3.5vw, 1.4rem);
+      width: clamp(48px, 12vw, 68px);
+      height: clamp(48px, 12vw, 68px);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(160deg, #fde68a, #d97706);
+      color: #78350f;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.18);
     }
 
     /* ── TRACING SCREEN ── */
