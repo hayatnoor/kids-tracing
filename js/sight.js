@@ -1,16 +1,11 @@
 'use strict';
 
-'use strict';
-
-// ── SIGHT WORDS MODE ──────────────────────────────────────────
-const SIGHT_WORDS = [
-  'all','am','are','at','be','but', 'is', 'for',
-  'did','do','get','good','have','he','into', 'it', 'go',
-  'no','now','on','our','out','ran', 'hat', 'bat', 'cat',
-  'saw','say','she','so','soon','that','there','they','this',
-  'too','want','was','well','went','what', 'we',
-  'who','will','with','yes', 'my'
-];
+// ── SIGHT WORDS MODE (KG) ────────────────────────────────────
+// Word list now sourced from the shared SIGHT_WORDS_BY_GRADE registry
+// (js/content/reading-topics.js) so KG and the 1st-3rd topic-select
+// flow share one source of truth, even though this KG flow/screen
+// itself is otherwise unchanged.
+const SIGHT_WORDS = SIGHT_WORDS_BY_GRADE.kg;
 
 const SIGHT_TOTAL = 10;
 let sightDone            = 0;
@@ -61,44 +56,6 @@ function renderSightChoices() {
   document.getElementById('sight-grid').innerHTML = choices.map(w =>
     `<button class="sight-card" onclick="checkSightAnswer('${w}')">${w}</button>`
   ).join('');
-}
-
-function speakWord(word) {
-  if (!window.speechSynthesis || !word) return;
-  window.speechSynthesis.cancel();
-
-  const btn = document.getElementById('sight-listen-btn');
-
-  function doSpeak(voices) {
-    const utt = new SpeechSynthesisUtterance(word);
-    utt.rate   = 0.7;
-    utt.pitch  = 1.15;
-    utt.volume = 1;
-
-    const preferred = ['Samantha (Enhanced)', 'Samantha', 'Karen', 'Moira', 'Tessa', 'Fiona', 'Victoria'];
-    const pick =
-      preferred.map(n => voices.find(v => v.name === n)).find(Boolean) ||
-      voices.find(v => v.lang.startsWith('en-US') && !v.name.includes('Alex')) ||
-      voices.find(v => v.lang.startsWith('en'));
-    if (pick) utt.voice = pick;
-    console.log('Speaking with voice:', pick ? pick.name : 'default', 'Available:', voices.map(v => v.name));
-
-    if (btn) btn.classList.add('speaking');
-    utt.onend  = () => { if (btn) btn.classList.remove('speaking'); };
-    utt.onerror = () => { if (btn) btn.classList.remove('speaking'); };
-    window.speechSynthesis.speak(utt);
-  }
-
-  const voices = window.speechSynthesis.getVoices();
-  if (voices.length) {
-    doSpeak(voices);
-  } else {
-    // Voices not loaded yet — wait for them
-    window.speechSynthesis.onvoiceschanged = () => {
-      window.speechSynthesis.onvoiceschanged = null;
-      doSpeak(window.speechSynthesis.getVoices());
-    };
-  }
 }
 
 function checkSightAnswer(word) {

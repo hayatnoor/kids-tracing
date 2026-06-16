@@ -2,7 +2,7 @@
 
 function tryAgain() {
   document.getElementById('result-overlay').classList.remove('active');
-  if (mode === 'math' || mode === 'sight' || mode === 'arabic' || mode === 'shapes' || mode === 'matching') {
+  if (currentQuiz || mode === 'math' || mode === 'sight' || mode === 'arabic' || mode === 'shapes' || mode === 'matching') {
     goHome();
   } else {
     clearDrawing();
@@ -11,7 +11,9 @@ function tryAgain() {
 
 function nextChar() {
   document.getElementById('result-overlay').classList.remove('active');
-  if (mode === 'math') {
+  if (currentQuiz) {
+    currentQuiz.start();
+  } else if (mode === 'math') {
     if (mathGrade === '1st') { startMath1st(); } else { startMath(); }
   } else if (mode === 'sight') {
     startSight();
@@ -69,42 +71,60 @@ function skipCurrent() {
 }
 
 let currentGrade = 'kg';
+let currentTopicCategory = null;
+
+const GRADE_HOME_SCREEN = {
+  kg:    'welcome',
+  '1st': 'grade-1-screen',
+  '2nd': 'grade-2-screen',
+  '3rd': 'grade-3-screen',
+  '4th': 'grade-4-screen',
+  '5th': 'grade-5-screen',
+};
 
 function selectGrade(grade) {
   currentGrade = grade;
   document.getElementById('grade-select').classList.remove('active');
-  if (grade === 'kg') {
-    document.getElementById('welcome').classList.add('active');
-  } else if (grade === '1st') {
-    document.getElementById('grade-1-screen').classList.add('active');
-  } else {
-    document.getElementById('grade-2-screen').classList.add('active');
-  }
+  document.getElementById(GRADE_HOME_SCREEN[grade]).classList.add('active');
 }
 
 function goGradePicker() {
-  document.getElementById('welcome').classList.remove('active');
-  document.getElementById('grade-1-screen').classList.remove('active');
-  document.getElementById('grade-2-screen').classList.remove('active');
+  document.querySelectorAll('.screen.active').forEach(el => el.classList.remove('active'));
   document.getElementById('grade-select').classList.add('active');
 }
 
 function goHome() {
   document.getElementById('result-overlay').classList.remove('active');
-  document.getElementById('tracing').classList.remove('active');
-  document.getElementById('mode-select').classList.remove('active');
-  document.getElementById('math-screen').classList.remove('active');
-  document.getElementById('sight-screen').classList.remove('active');
-  document.getElementById('arabic-screen').classList.remove('active');
-  document.getElementById('shapes-screen').classList.remove('active');
-  document.getElementById('matching-size-screen').classList.remove('active');
-  document.getElementById('matching-screen').classList.remove('active');
-  if (currentGrade === '1st') {
-    document.getElementById('grade-1-screen').classList.add('active');
-  } else {
-    document.getElementById('welcome').classList.add('active');
-  }
+  document.querySelectorAll('.screen.active').forEach(el => el.classList.remove('active'));
+  document.getElementById(GRADE_HOME_SCREEN[currentGrade]).classList.add('active');
+  currentQuiz = null;
   if (window.speechSynthesis) window.speechSynthesis.cancel();
+}
+
+// ── TOPIC SELECT (1st-5th: Math/Reading -> topic -> quiz) ──────
+function showTopicSelect(category) {
+  currentTopicCategory = category;
+  const catalog = category === 'math' ? MATH_TOPIC_CATALOG : READING_TOPIC_CATALOG;
+  const meta    = category === 'math' ? MATH_TOPIC_META    : READING_TOPIC_META;
+  const topics  = catalog[currentGrade] || [];
+
+  document.getElementById('topic-select-emoji').textContent = category === 'math' ? '🧮' : '📖';
+  document.getElementById('topic-select-title').textContent = category === 'math' ? 'Choose a math topic' : 'Choose a reading topic';
+  document.getElementById('topic-grid').innerHTML = topics.map(key => {
+    const m = meta[key];
+    return `<button class="btn btn-xl" style="background:${m.color};color:${m.textColor};box-shadow:0 9px 0 rgba(0,0,0,0.22);" onclick="startTopic('${key}')">${m.label}</button>`;
+  }).join('');
+
+  document.querySelectorAll('.screen.active').forEach(el => el.classList.remove('active'));
+  document.getElementById('topic-select-screen').classList.add('active');
+}
+
+function startTopic(topicKey) {
+  if (currentTopicCategory === 'math') {
+    startMathTopic(topicKey, currentGrade);
+  } else {
+    startReadingTopic(topicKey, currentGrade);
+  }
 }
 
 // ── PROGRESS DOTS ─────────────────────────────────────────────

@@ -44,6 +44,45 @@ function playSound(type) {
   else if (type === 'error') { buzz(220,.00,.14); buzz(175,.15,.28); }
 }
 
+// ── SPEECH ────────────────────────────────────────────────────
+// Shared by sight words, phonics, and vocabulary topics — toggles the
+// 'speaking' pulse animation on whichever .listen-btn is on screen.
+function speakWord(word) {
+  if (!window.speechSynthesis || !word) return;
+  window.speechSynthesis.cancel();
+
+  const btns = document.querySelectorAll('.screen.active .listen-btn');
+
+  function doSpeak(voices) {
+    const utt = new SpeechSynthesisUtterance(word);
+    utt.rate   = 0.7;
+    utt.pitch  = 1.15;
+    utt.volume = 1;
+
+    const preferred = ['Samantha (Enhanced)', 'Samantha', 'Karen', 'Moira', 'Tessa', 'Fiona', 'Victoria'];
+    const pick =
+      preferred.map(n => voices.find(v => v.name === n)).find(Boolean) ||
+      voices.find(v => v.lang.startsWith('en-US') && !v.name.includes('Alex')) ||
+      voices.find(v => v.lang.startsWith('en'));
+    if (pick) utt.voice = pick;
+
+    btns.forEach(b => b.classList.add('speaking'));
+    utt.onend   = () => btns.forEach(b => b.classList.remove('speaking'));
+    utt.onerror = () => btns.forEach(b => b.classList.remove('speaking'));
+    window.speechSynthesis.speak(utt);
+  }
+
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length) {
+    doSpeak(voices);
+  } else {
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.onvoiceschanged = null;
+      doSpeak(window.speechSynthesis.getVoices());
+    };
+  }
+}
+
 function shakeCanvas() {
   const el = document.getElementById('canvas-wrap');
   el.classList.remove('shake');

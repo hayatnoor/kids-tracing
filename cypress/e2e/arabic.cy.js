@@ -7,6 +7,7 @@ function getCurrentChar() {
 describe('Arabic Letters Mode', () => {
   beforeEach(() => {
     cy.visitApp('/');
+    cy.selectGrade('KG');
     cy.contains('🌙 Arabic').click();
   });
 
